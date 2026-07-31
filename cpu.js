@@ -128,11 +128,21 @@ export class Chip8 {
                 break;
             }
             break;
+        case 0x6000: /* 6XKK - LD Vx, byte */
+            this.cpuTrace("LD Vx, byte", op);
+            this.V[this.get_x(op)] = this.get_kk(op);
+            this.PC += 2;
+            break;
+        case 0x7000: /* 7XKK - ADD Vx, byte */
+            this.cpuTrace("ADD Vx, byte", op);
+            this.V[this.get_x(op)] = (this.V[this.get_x(op)] + this.get_kk(op)) & 0xFF;
+            this.PC += 2;
+            break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             this.cpuTrace("DRW Vx, Vy", op);
 
-            let x = this.V[this.get_x(x)] % 64;
-            let y = this.V[this.get_y(y)] % 32;
+            let x = this.V[this.get_x(op)] % 64;
+            let y = this.V[this.get_y(op)] % 32;
             let h = this.get_n(op);
 
             this.V[0xF] = 0;
