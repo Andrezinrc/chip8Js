@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap");
+
 * {
     margin: 0;
     padding: 0;
@@ -5,11 +7,87 @@
 }
 
 :root {
-    --bg: #111;
-    --text: #fff;
+    --bg: #d4d4d4;
+    --vid: #c7c7c2;
+    --border: #a7a7a2;
+    --text: #1d1d1d;
 }
 
 body {
     background: var(--bg);
     color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    flex: 0 0 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header h1 {
+    font-size: 1rem;
+    font height: 550;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.video {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 2/1;
+    background: #000;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.controls { flex: 0 0 46px; }
+
+.upload input { display: none; }
+
+.upload span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 46px;
+    background: var(--vid);
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    transition: .15s;
+}
+
+footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 10px;
+    font-size: .8rem;
+    border-top: 1px solid var(--border);
+}
+
+footer a {
+    color: #7d8896;
+    text-decoration: none;
 }

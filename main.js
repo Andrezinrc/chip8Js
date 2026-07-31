@@ -1,9 +1,11 @@
 import {Chip8} from './cpu.js';
+import {Video} from './video.js';
 
 const canvas =  document.getElementById("screen");
 const ctx = canvas.getContext("2d");
 
 const cpu = new Chip8();
+const video = new Video(ctx);
 
 document.getElementById("rom-upload").addEventListener("change", async(event)  => {
     const file =  event.target.files[0];
@@ -23,5 +25,6 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
 function mainLoop()
 {
     cpu.cpuCycle();
+    video.render(cpu);
     requestAnimationFrame(mainLoop);
 }

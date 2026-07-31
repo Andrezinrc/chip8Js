@@ -11,7 +11,7 @@ export class Chip8 {
         this.SP      = 0;
 
         // Video
-        this.display = new Uint8Array(2048);
+        this.video = new Uint8Array(2048);
 
         // Timers
         this.DT      = 0;
@@ -66,7 +66,7 @@ export class Chip8 {
         case 0x0000:
             switch (this.get_kk(op)) {
             case 0x00E0: /* CLS */
-                this.display.fill(0);
+                this.video.fill(0);
                 this.PC += 2;
                 break;
             case 0x00EE: /* RET */
@@ -103,6 +103,35 @@ export class Chip8 {
                 break;
             }
             break;
+        case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
+            let x = this.V[this.get_x(x)] % 64;
+            let y = this.V[this.get_y(y)] % 32;
+            let h = this.get_n(op);
+
+            this.V[0xF] = 0;
+
+            for (let row = 0; row < h; row++) {
+                let spriteRow = this.memory[this.I + row];
+                
+                for (let col = 0; col < 8; col++) {
+                    
+                    if ((spriteRow & (0x80 >> col)) != 0) {
+                        let px = x + col;
+                        let py = y + row;
+
+                        if (py < 64 && py < 32) {
+                            let vid_index = px + (py * 64);
+                            if (this.video[vid_index] === 1)
+                                this.V[0xF] = 1;
+                            this.video[vid_index] ^= 1;
+                        }
+                    }
+                }
+            }
+
+            this.PC += 2;
+            break;
+        }
         default:
             this.UNKNOWN_OPCODE(op);
             break;
