@@ -7,7 +7,7 @@ export class Chip8 {
         this.PC      = 0x200;
 
         // Stack
-        this.stack   = new Uint8Array(16);
+        this.stack   = new Uint16Array(16);
         this.SP      = 0;
 
         // Video
@@ -16,6 +16,8 @@ export class Chip8 {
         // Timers
         this.DT      = 0;
         this.ST      = 0;
+
+        this.debug   = true;
 
         this.cpuInit();
     }
@@ -39,6 +41,16 @@ export class Chip8 {
 
     cpuInit() {   console.log("--- Initializing CPU ---\n");   }
 
+    
+    // Trace
+
+    cpuTrace(name, op) {
+        if (!this.debug) return;
+
+        
+    }
+
+
     // CPU Instructions
 
     cpuStep() {
@@ -59,6 +71,27 @@ export class Chip8 {
                 break;
             default: /* SYS */
                 this.PC += 2;
+                break;
+            }
+            break;
+        case 0x1000: /* 1NNN - JP addr */
+            this.PC = this.get_nnn(op);
+            break;
+        case 0x2000: /* 2NNN - CALL addr */
+            this.stack[this.SP] = this.PC;
+            this.SP++;
+            this.PC = this.get_nnn();
+            break;
+        case 0x3000: /* 3XKK - SE Vx, byte */
+            this.PC += (this.V[this.get_x(op)] == this.get_kk(op)) ? 4 : 2;
+            break;
+        case 0x4000:
+            this.PC += (this.V[this.get_x(op)] != this.get_kk(op)) ? 4 : 2;
+            break;
+        case 0x5000:
+            switch (this.get_n(op)) {
+            case 0x0: /* 5XY0 - SE Vx, Vy */
+                this.PC += (this.V[this.get_x(op)] == this.get_y(op)) ? 4 : 2;
                 break;
             }
             break;
