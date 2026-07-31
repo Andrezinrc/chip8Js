@@ -38,10 +38,15 @@ export class Chip8 {
     // Load rom
 
     loadRom(romData) {
+        this.memory.fill(0, 0x200);
+        this.video.fill(0);
+
         if (romData.length <=  3584) {
             for (let i = 0; i < romData.length; i++)
                 this.memory[0x200 + i] = romData[i];
         }
+
+        this.PC = 0x200;
     }
 
     cpuInit() {   console.log("--- Initializing CPU ---\n");   }
@@ -52,7 +57,19 @@ export class Chip8 {
     cpuTrace(name, op) {
         if (!this.debug) return;
 
+        const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
+        const opStr = op.toString(16).toUpperCase().padStart(4, '0');
         
+        const x = this.get_x(op);
+        const y = this.get_y(op);
+        
+        const vxStr = this.V[x].toString(16).toUpperCase().padStart(2, '0');
+        const vyStr = this.V[y].toString(16).toUpperCase().padStart(2, '0');
+        const iStr = this.I.toString(16).toUpperCase().padStart(4, '0');
+
+        console.log(`[0x${pcStr}] ${name.padEnd(10, ' ')} (0x${opStr}) |
+                    V${x.toString(16).toUpperCase()}=${vxStr},
+                    V${y.toString(16).toUpperCase()}=${vyStr}, I=${iStr}`);
     }
 
 
@@ -66,36 +83,44 @@ export class Chip8 {
         case 0x0000:
             switch (this.get_kk(op)) {
             case 0x00E0: /* CLS */
+                this.cpuTrace("CLS", op);
                 this.video.fill(0);
                 this.PC += 2;
                 break;
             case 0x00EE: /* RET */
+                this.cpuTrace("RET", op);
                 this.SP--;
                 this.PC = this.stack[this.SP];
                 this.PC += 2;
                 break;
             default: /* SYS */
+                this.cpuTrace("SYS", op);
                 this.PC += 2;
                 break;
             }
             break;
         case 0x1000: /* 1NNN - JP addr */
+            this.cpuTrace("JP", op);
             this.PC = this.get_nnn(op);
             break;
         case 0x2000: /* 2NNN - CALL addr */
+            this.cpuTrace("CALL", op);
             this.stack[this.SP] = this.PC;
             this.SP++;
             this.PC = this.get_nnn(op);
             break;
         case 0x3000: /* 3XKK - SE Vx, byte */
+            this.cpuTrace("SE Vx, byte", op);
             this.PC += (this.V[this.get_x(op)] == this.get_kk(op)) ? 4 : 2;
             break;
         case 0x4000: /* 4XKK - SNE Vx, byte */
+            this.cpuTrace("SNE Vx, byte",op);
             this.PC += (this.V[this.get_x(op)] != this.get_kk(op)) ? 4 : 2;
             break;
         case 0x5000:
             switch (this.get_n(op)) {
             case 0x0: /* 5XY0 - SE Vx, Vy */
+                this.cpuTrace("SE Vx, Vy", op);
                 this.PC += (this.V[this.get_x(op)] == this.get_y(op)) ? 4 : 2;
                 break;
             default:
@@ -104,6 +129,8 @@ export class Chip8 {
             }
             break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
+            this.cpuTrace("DRW Vx, Vy", op);
+
             let x = this.V[this.get_x(x)] % 64;
             let y = this.V[this.get_y(y)] % 32;
             let h = this.get_n(op);
