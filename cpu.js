@@ -22,6 +22,11 @@ export class Chip8 {
         this.cpuInit();
     }
 
+    UNKNOWN_OPCODE(op) {
+        console.log(`Unknown opcode: 0x${op.toString(16)}`);
+    }
+
+
     // Instruction operand extractors
     
     get_x(op)   {   return (op & 0x0F00) >> 8;   }
@@ -80,12 +85,12 @@ export class Chip8 {
         case 0x2000: /* 2NNN - CALL addr */
             this.stack[this.SP] = this.PC;
             this.SP++;
-            this.PC = this.get_nnn();
+            this.PC = this.get_nnn(op);
             break;
         case 0x3000: /* 3XKK - SE Vx, byte */
             this.PC += (this.V[this.get_x(op)] == this.get_kk(op)) ? 4 : 2;
             break;
-        case 0x4000:
+        case 0x4000: /* 4XKK - SNE Vx, byte */
             this.PC += (this.V[this.get_x(op)] != this.get_kk(op)) ? 4 : 2;
             break;
         case 0x5000:
@@ -93,7 +98,13 @@ export class Chip8 {
             case 0x0: /* 5XY0 - SE Vx, Vy */
                 this.PC += (this.V[this.get_x(op)] == this.get_y(op)) ? 4 : 2;
                 break;
+            default:
+                this.UNKNOWN_OPCODE(op);
+                break;
             }
+            break;
+        default:
+            this.UNKNOWN_OPCODE(op);
             break;
         }
     }

@@ -11,9 +11,9 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
 
     try {
         const buffer = await file.arrayBuffer();
-        const rom = new Uint8Array();
+        const rom = new Uint8Array(buffer);
 
-        cpu.loadRom();
+        cpu.loadRom(rom);
         requestAnimationFrame(mainLoop);
     } catch(error) {
         console.log("Error loading ROM: ", error);
