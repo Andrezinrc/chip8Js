@@ -17,7 +17,7 @@ export class Chip8 {
         this.DT      = 0;
         this.ST      = 0;
 
-        this.debug   = false;
+        this.debug   = true;
 
         this.cpuInit();
     }
@@ -160,12 +160,54 @@ export class Chip8 {
                 this.V[this.get_x(op)] ^= this.V[this.get_y(op)];
                 this.PC += 2;
                 break;
-            case 0x4: /* 8XY4 - ADD Vx, Vy */
-            case 0x5: /* 8XY5 - SUB Vx, Vy */
-            case 0x6: /* 8XY6 - SHR Vx {, Vy} */
-            case 0x7: /* 8XY7 - SUBN Vx, Vy */
-            case 0xE: /* 8XYE - SHL Vx {, Vy} */
+            case 0x4: { /* 8XY4 - ADD Vx, Vy */
+                this.cpuTrace("ADD Vx, Vy", op);
+                let sum = this.V[this.get_x(op)] + this.V[this.get_y(op)];
+                this.V[this.get_x(op)] = sum & 0xFF;
+                this.V[0xF] = (sum > 255) ? 1 : 0;
+                this.PC += 2;
+                break;
             }
+            case 0x5: { /* 8XY5 - SUB Vx, Vy */
+                this.cpuTrace("SUB Vx, Vy", op);
+                let borrow = (this.V[this.get_x(op)]) >= this.V[this.get_y(op)] ? 1 : 0;
+                this.V[this.get_x(op)] = (this.V[this.get_x(op)] - this.V[this.get_y(op)]) & 0xFF;
+                this.V[0xF] = borrow;
+                this.PC += 2;
+                break;
+            }
+            case 0x6: { /* 8XY6 - SHR Vx {, Vy} */
+                this.cpuTrace("SHR Vx, Vy", op);
+                let f_val = this.V[this.get_x(op)] & 0x01;
+                this.V[this.get_x(op)] >>= 1;
+                this.V[0xF] = f_val;
+                this.PC += 2;
+                break;
+            }
+            case 0x7: { /* 8XY7 - SUBN Vx, Vy */
+                this.cpuTrace("SUBN Vx, Vy", op);
+                let borrow =  (this.V[this.get_y(op)] >= this.V[this.get_x(op)]) ? 1 : 0;
+                this.V[this.get_x(op)] = (this.V[this.get_y(op)] - this.V[this.get_x(op)]) & 0xFF;
+                this.V[0xF] = borrow;
+                this.PC += 2;
+                break;
+            }
+            case 0xE: { /* 8XYE - SHL Vx {, Vy} */
+                this.cpuTrace("SHL Vx, Vy", op);
+                let f_val = (this.V[this.get_x(op)] >> 7) & 0x01;
+                this.V[this.get_x(op)] = (this.V[this.get_x(op)] << 1) & 0xFF;
+                this.V[0xF] =  f_val;
+                this.PC += 2;
+                break;
+            }
+            default:
+                this.UNKNOWN_OPCODE(op);
+                break;
+            }
+            break;
+        case 0x9000: /* 9XY0 - SNE Vx, Vy */
+            this.cpuTrace("SNE Vx, Vy", op);
+            this.PC += (this.V[this.get_x(op)] != this.V[this.get_y(op)]) ? 4 : 2;
             break;
         case 0xA000: /* ANNN - LD I, addr */
             this.cpuTrace("LD I, addr", op);
