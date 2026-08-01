@@ -138,6 +138,31 @@ export class Chip8 {
             this.V[this.get_x(op)] = (this.V[this.get_x(op)] + this.get_kk(op)) & 0xFF;
             this.PC += 2;
             break;
+        case 0x8000:
+            switch (this.get_n(op)) {
+            case 0x0: /* 8XY0 - LD Vx, Vy */
+                this.V[this.get_x(op)] = this.V[this.get_y(op)];
+                this.PC += 2;
+                break;
+            case 0x1: /* 8XY1 - OR Vx, Vy */
+                this.V[this.get_x(op)] |= this.V[this.get_y(op)];
+                this.PC += 2;
+                break;
+            case 0x2: /* 8XY2 - AND Vx, Vy */
+                this.V[this.get_x(op)] &= this.V[this.get_y(op)];
+                this.PC += 2;
+                break;
+            case 0x3: /* 8XY3 - XOR Vx, Vy */
+                this.V[this.get_x(op)] ^= this.V[this.get_y(op)];
+                this.PC += 2;
+                break;
+            case 0x4: /* 8XY4 - ADD Vx, Vy */
+            case 0x5: /* 8XY5 - SUB Vx, Vy */
+            case 0x6: /* 8XY6 - SHR Vx {, Vy} */
+            case 0x7: /* 8XY7 - SUBN Vx, Vy */
+            case 0xE: /* 8XYE - SHL Vx {, Vy} */
+            }
+            break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             this.cpuTrace("DRW Vx, Vy", op);
 
