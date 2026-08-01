@@ -17,7 +17,7 @@ export class Chip8 {
         this.DT      = 0;
         this.ST      = 0;
 
-        this.debug   = true;
+        this.debug   = false;
 
         this.cpuInit();
     }
@@ -121,7 +121,7 @@ export class Chip8 {
             switch (this.get_n(op)) {
             case 0x0: /* 5XY0 - SE Vx, Vy */
                 this.cpuTrace("SE Vx, Vy", op);
-                this.PC += (this.V[this.get_x(op)] == this.get_y(op)) ? 4 : 2;
+                this.PC += (this.V[this.get_x(op)] === this.get_y(op)) ? 4 : 2;
                 break;
             default:
                 this.UNKNOWN_OPCODE(op);
@@ -141,18 +141,22 @@ export class Chip8 {
         case 0x8000:
             switch (this.get_n(op)) {
             case 0x0: /* 8XY0 - LD Vx, Vy */
+                this.cpuTrace("LD Vx, Vy", op);
                 this.V[this.get_x(op)] = this.V[this.get_y(op)];
                 this.PC += 2;
                 break;
             case 0x1: /* 8XY1 - OR Vx, Vy */
+                this.cpuTrace("OR Vx, Vy", op);
                 this.V[this.get_x(op)] |= this.V[this.get_y(op)];
                 this.PC += 2;
                 break;
             case 0x2: /* 8XY2 - AND Vx, Vy */
+                this.cpuTrace("AND Vx, Vy", op);
                 this.V[this.get_x(op)] &= this.V[this.get_y(op)];
                 this.PC += 2;
                 break;
             case 0x3: /* 8XY3 - XOR Vx, Vy */
+                this.cpuTrace("XOR Vx, Vy", op);
                 this.V[this.get_x(op)] ^= this.V[this.get_y(op)];
                 this.PC += 2;
                 break;
@@ -162,6 +166,11 @@ export class Chip8 {
             case 0x7: /* 8XY7 - SUBN Vx, Vy */
             case 0xE: /* 8XYE - SHL Vx {, Vy} */
             }
+            break;
+        case 0xA000: /* ANNN - LD I, addr */
+            this.cpuTrace("LD I, addr", op);
+            this.I = this.get_nnn(op);
+            this.PC += 2;
             break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             this.cpuTrace("DRW Vx, Vy", op);
@@ -181,7 +190,7 @@ export class Chip8 {
                         let px = x + col;
                         let py = y + row;
 
-                        if (py < 64 && py < 32) {
+                        if (px < 64 && py < 32) {
                             let vid_index = px + (py * 64);
                             if (this.video[vid_index] === 1)
                                 this.V[0xF] = 1;

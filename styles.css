@@ -86,8 +86,3 @@ footer {
     font-size: .8rem;
     border-top: 1px solid var(--border);
 }
-
-footer a {
-    color: #7d8896;
-    text-decoration: none;
-}

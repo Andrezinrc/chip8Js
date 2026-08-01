@@ -12,10 +12,10 @@ export class Video {
             let pIndex = i * 4;
             let color = video[i] == 1 ? 255 : 0;
 
-            video[pIndex]     = color;
-            video[pIndex + 1] = color;
-            video[pIndex + 2] = color;
-            video[pIndex + 3] = 255;
+            data[pIndex]     = color;
+            data[pIndex + 1] = color;
+            data[pIndex + 2] = color;
+            data[pIndex + 3] = 255;
         }
 
         this.ctx.putImageData(this.imgData, 0, 0);
