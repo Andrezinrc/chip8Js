@@ -25,6 +25,7 @@ export class Chip8 {
         this.DT      = 0;
         this.ST      = 0;
 
+        this.cyclesPerFrame = 10;
         this.debug   = false;
 
         this.cpuInit();
@@ -404,7 +405,7 @@ export class Chip8 {
     // Execute CPU cycle
 
     cpuCycle() {
-        for (let i = 0; i < 10; i++)
+        for (let i = 0; i < this.cyclesPerFrame; i++)
             this.cpuStep();
 
         if (this.DT > 0) this.DT--;

@@ -63,7 +63,10 @@ canvas {
     image-rendering: crisp-edges;
 }
 
-.controls { flex: 0 0 46px; }
+.controls {
+    display: flex;
+    flex-direction: column;
+}
 
 .upload input { display: none; }
 
@@ -79,6 +82,56 @@ canvas {
     transition: .15s;
     user-select: none;
     -webkit-user-select: none;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+}
+
+.speed-control {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    background: var(--vid);
+    border-top: 1px solid var(--border);
+}
+
+.speed-control span {
+    font-size: .75rem;
+    letter-spacing: .08em;
+    user-select: none;
+}
+
+.speed-control input[type="range"] {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #1d1d1d;
+    cursor: pointer;
+}
+
+.speed-control input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: none;
+    border-radius: 50%;
+    background: #1d1d1d;
+    cursor: pointer;
 }
 
 .keypad {

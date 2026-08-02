@@ -11,6 +11,8 @@ const video = new Video(ctx);
 
 let animationId = null;
 
+const speedSlider = document.getElementById("speed");
+const speedValue = document.getElementById("speed-value");
 
 document.getElementById("rom-upload").addEventListener("change", async(event)  => {
     const file =  event.target.files[0];
@@ -30,6 +32,12 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
     } catch(error) {
         console.log("Error loading ROM: ", error);
     }
+});
+
+speedSlider.addEventListener("input", (e) => {
+    const value = Number(e.target.value);
+    cpu.cyclesPerFrame = value;
+    speedValue.textContent = `${value}x`;
 });
 
 function mainLoop()
