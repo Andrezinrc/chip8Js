@@ -1,3 +1,5 @@
+import {Keypad} from './keypad.js';
+
 export class Chip8 {
     constructor() {
         // Core
@@ -12,6 +14,9 @@ export class Chip8 {
 
         // Video
         this.video = new Uint8Array(2048);
+
+        // keypad
+        this.keypad = new Keypad();
 
         // Timers
         this.DT      = 0;
@@ -213,6 +218,36 @@ export class Chip8 {
             this.cpuTrace("LD I, addr", op);
             this.I = this.get_nnn(op);
             this.PC += 2;
+            break;
+        case 0xB000: /* BNNN - JP V0, addr */
+            this.cpuTrace("JP V0, addr", op);
+            this.PC = this.get_nnn(op) + this.V[0x0];
+            break;
+        case 0xC000: /* CXKK - RND Vx, byte */
+            this.cpuTrace("RND Vx, Vy", op);
+            this.V[this.get_x(op)] = (Math.floor(Math.random() * 0x100)) & this.get_kk(op);
+            this.PC += 2;
+            break;
+        case 0xE000:
+            switch (this.get_kk(op)) {
+            case 0x9E: /* EX9E - SKP Vx */
+                this.cpuTrace("SKP Vx", op);
+                if (this.keypad.isPressed(this.V[this.get_x(op)]))
+                    this.PC += 4;
+                else
+                    this.PC += 2;
+                break;
+            case 0xA1: /* EXA1 - SKNP Vx */
+                this.cpuTrace("SKNP Vx", op);
+                if (!this.keypad.isPressed(this.V[this.get_x(op)]))
+                    this.PC += 4;
+                else
+                    this.PC += 2;
+                break;
+            default:
+                this.UNKNOWN_OPCODE(op);
+                break;
+            }
             break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             this.cpuTrace("DRW Vx, Vy", op);
