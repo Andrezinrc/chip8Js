@@ -9,6 +9,9 @@ const keypad = new Keypad();
 const cpu = new Chip8(keypad);
 const video = new Video(ctx);
 
+let animationId = null;
+
+
 document.getElementById("rom-upload").addEventListener("change", async(event)  => {
     const file =  event.target.files[0];
     if (!file) return;
@@ -17,8 +20,13 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
         const buffer = await file.arrayBuffer();
         const rom = new Uint8Array(buffer);
 
+        if (animationId !== null) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        } 
+
         cpu.loadRom(rom);
-        requestAnimationFrame(mainLoop);
+        animationId = requestAnimationFrame(mainLoop);
     } catch(error) {
         console.log("Error loading ROM: ", error);
     }
@@ -28,5 +36,5 @@ function mainLoop()
 {
     cpu.cpuCycle();
     video.render(cpu);
-    requestAnimationFrame(mainLoop);
+    animationId = requestAnimationFrame(mainLoop);
 }

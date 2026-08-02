@@ -46,15 +46,15 @@ export class Chip8 {
     // Load rom
 
     loadRom(romData) {
-        this.memory.fill(0, 0x200);
-        this.video.fill(0);
+        this.cpuReset();
 
-        if (romData.length <=  3584) {
-            for (let i = 0; i < romData.length; i++)
-                this.memory[0x200 + i] = romData[i];
+        if (romData.length > 3584) {
+            console.log("ROM too large");
+            return;
         }
 
-        this.PC = 0x200;
+        for (let i = 0; i < romData.length; i++)
+            this.memory[0x200 + i] = romData[i];
     }
 
     cpuInit() {
@@ -64,6 +64,24 @@ export class Chip8 {
     }
 
     
+    cpuReset() {
+        this.memory.fill(0);
+        this.V.fill(0);
+        this.I = 0;
+        this.PC = 0x200;
+        this.stack.fill(0);
+        this.SP = 0;
+        this.video.fill(0);
+        this.waitingKey = false;
+        this.keyPressed = -1;
+        this.keyRegister = 0;
+        this.DT = 0;
+        this.ST = 0;
+
+        for (let i = 0; i < FONTSET.length; i++)
+            this.memory[i] = FONTSET[i];
+    }
+
     // Trace
 
     cpuTrace(name, op) {
@@ -344,7 +362,7 @@ export class Chip8 {
                 break;
             case 0x29: /* FX29 - LD F, Vx */
                 this.cpuTrace("LD F, Vx",op);
-                this.I = 0x50 + (this.V[this.get_x(op)] * 5);
+                this.I = this.V[this.get_x(op)] * 5;
                 this.PC += 2;
                 break;
             case 0x33: { /* Fx33 - LD B, Vx */
