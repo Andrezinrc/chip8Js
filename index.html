@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CHIP-8 Emulator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
 </head>
 <body>
     <header>
@@ -13,7 +15,7 @@
 
     <main class="container">
         <section class="video">
-            <canvas id="screen" width="64" height="32" role="img"><canvas>
+            <canvas id="screen" width="64" height="32" role="img"></canvas>
         </section>
 
         <section class="controls">
@@ -51,5 +53,10 @@
     </footer>
 
     <script type="module" src="main.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./sw.js");
+        }
+    </script>
 </body>
 </html>
