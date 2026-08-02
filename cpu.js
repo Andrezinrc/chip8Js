@@ -1,7 +1,7 @@
-import {Keypad} from './keypad.js';
+import {FONTSET} from './fontset.js';
 
 export class Chip8 {
-    constructor() {
+    constructor(keypad) {
         // Core
         this.memory  = new Uint8Array(4096);
         this.V       = new Uint8Array(16);
@@ -16,7 +16,10 @@ export class Chip8 {
         this.video = new Uint8Array(2048);
 
         // keypad
-        this.keypad = new Keypad();
+        this.keypad = keypad;
+        this.waitingKey = false;
+        this.keyPressed = -1;
+        this.keyRegister = 0;
 
         // Timers
         this.DT      = 0;
@@ -54,7 +57,11 @@ export class Chip8 {
         this.PC = 0x200;
     }
 
-    cpuInit() {   console.log("--- Initializing CPU ---\n");   }
+    cpuInit() {
+        console.log("--- Initializing CPU ---\n");
+        for (let i = 0; i < FONTSET.length; i++)
+            this.memory[i] = FONTSET[i];
+    }
 
     
     // Trace
@@ -228,27 +235,6 @@ export class Chip8 {
             this.V[this.get_x(op)] = (Math.floor(Math.random() * 0x100)) & this.get_kk(op);
             this.PC += 2;
             break;
-        case 0xE000:
-            switch (this.get_kk(op)) {
-            case 0x9E: /* EX9E - SKP Vx */
-                this.cpuTrace("SKP Vx", op);
-                if (this.keypad.isPressed(this.V[this.get_x(op)]))
-                    this.PC += 4;
-                else
-                    this.PC += 2;
-                break;
-            case 0xA1: /* EXA1 - SKNP Vx */
-                this.cpuTrace("SKNP Vx", op);
-                if (!this.keypad.isPressed(this.V[this.get_x(op)]))
-                    this.PC += 4;
-                else
-                    this.PC += 2;
-                break;
-            default:
-                this.UNKNOWN_OPCODE(op);
-                break;
-            }
-            break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             this.cpuTrace("DRW Vx, Vy", op);
 
@@ -276,10 +262,114 @@ export class Chip8 {
                     }
                 }
             }
-
+            
             this.PC += 2;
             break;
         }
+        case 0xE000:
+            switch (this.get_kk(op)) {
+            case 0x9E: /* EX9E - SKP Vx */
+                this.cpuTrace("SKP Vx", op);
+                if (this.keypad.isPressed(this.V[this.get_x(op)]))
+                    this.PC += 4;
+                else
+                    this.PC += 2;
+                break;
+            case 0xA1: /* EXA1 - SKNP Vx */
+                this.cpuTrace("SKNP Vx", op);
+                if (!this.keypad.isPressed(this.V[this.get_x(op)]))
+                    this.PC += 4;
+                else
+                    this.PC += 2;
+                break;
+            default:
+                this.UNKNOWN_OPCODE(op);
+                break;
+            }
+            break;
+        case 0xF000:
+            switch (this.get_kk(op)) {
+            case 0x07: /* FX07 - LD Vx, DT */
+                this.cpuTrace("LD Vx, DT");
+                this.V[this.get_x(op)] = this.DT;
+                this.PC += 2;
+                break;
+            case 0x0A: { /* FX0A - LD Vx, K */
+                this.cpuTrace("LD Vx, K", op);
+
+                if (this.waitingKey) {
+                    if (!this.keypad.isPressed(this.keyPressed)) {
+                        this.V[this.keyRegister] = this.keyPressed;
+                        
+                        this.waitingKey = false;
+                        this.keyPressed = -1;
+
+                        this.PC += 2;
+                    }
+                    break; 
+                }
+
+                for (let i = 0; i < 16; i++) {
+                    if (this.keypad.isPressed(i)) {
+                        this.keyPressed = i;
+                        
+                        this.keyRegister =  this.get_x(op);
+                        this.waitingKey = true;
+                        
+                        break;
+                    }
+                }
+                break;
+            }
+            case 0x15: /* FX15 - LD DT, Vx */
+                this.cpuTrace("LD DT, Vx", op);
+                this.DT = this.V[this.get_x(op)];
+                this.PC += 2;
+                break;
+            case 0x18: /* Fx18 - LD ST, Vx */
+                this.cpuTrace("LD ST, Vx", op);
+                this.ST = this.V[this.get_x(op)];
+                this.PC += 2;
+                break;
+            case 0x1E: /* FX1E - ADD I, Vx */
+                this.cpuTrace("ADD I, Vx", op);
+                this.I += this.V[this.get_x(op)];
+                this.PC += 2;
+                break;
+            case 0x29: /* FX29 - LD F, Vx */
+                this.cpuTrace("LD F, Vx",op);
+                this.I = this.V[this.get_x(op)] * 5;
+                this.PC += 2;
+                break;
+            case 0x33: { /* Fx33 - LD B, Vx */
+                this.cpuTrace("LD B, Vx", op);
+                let value = this.V[this.get_x(op)];
+                this.memory[this.I] = Math.floor(value / 10);
+                this.memory[this.I + 1] = Math.floor(value / 10) % 10;
+                this.memory[this.I + 2] = value % 10;
+                this.PC += 2;
+                break;
+            }
+            case 0x55: { /* Fx55 - LD [I], Vx */
+                this.cpuTrace("LD [i], Vx", op);
+                let x = this.get_x(op);
+                for (let i = 0; i <= x; i++)
+                    this.memory[this.I + i] = this.V[i];
+                this.PC += 2;
+                break;
+            }
+            case 0x65: { /* FX65 - LD Vx, [I] */
+                this.cpuTrace("LD Vx, [i]", op);
+                let x =  this.get_x(op);
+                for (let i = 0; i <= x; i++)
+                    this.memory[this.I + i];
+                this.PC += 2;
+                break;
+            }
+            default:
+                this.UNKNOWN_OPCODE(op);
+                break;
+            }
         default:
             this.UNKNOWN_OPCODE(op);
             break;

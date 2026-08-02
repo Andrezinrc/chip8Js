@@ -77,6 +77,8 @@ canvas {
     color: var(--text);
     cursor: pointer;
     transition: .15s;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .keypad {

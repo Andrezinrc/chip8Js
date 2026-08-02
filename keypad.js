@@ -40,7 +40,7 @@ export class Keypad {
         }
     }
 
-    release() {
+    release(key) {
         this.keys[key] = 0;
     }
 
@@ -82,7 +82,7 @@ export class Keypad {
     }
 
     installTouch() {
-        if (this.dom)
+        if (!this.dom)
             return;
 
         const start = e => {

@@ -1,10 +1,12 @@
 import {Chip8} from './cpu.js';
 import {Video} from './video.js';
+import {Keypad} from './keypad.js';
 
 const canvas =  document.getElementById("screen");
 const ctx = canvas.getContext("2d");
 
-const cpu = new Chip8();
+const keypad = new Keypad();
+const cpu = new Chip8(keypad);
 const video = new Video(ctx);
 
 document.getElementById("rom-upload").addEventListener("change", async(event)  => {
