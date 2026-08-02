@@ -25,7 +25,7 @@ export class Chip8 {
         this.DT      = 0;
         this.ST      = 0;
 
-        this.debug   = true;
+        this.debug   = false;
 
         this.cpuInit();
     }
@@ -288,6 +288,12 @@ export class Chip8 {
             }
             break;
         case 0xF000:
+            //console.log(
+            //   "FX opcode:",
+            //    op.toString(16),
+            //    "kk:",
+            //    this.get_kk(op).toString(16)
+            //);
             switch (this.get_kk(op)) {
             case 0x07: /* FX07 - LD Vx, DT */
                 this.cpuTrace("LD Vx, DT");
@@ -338,13 +344,13 @@ export class Chip8 {
                 break;
             case 0x29: /* FX29 - LD F, Vx */
                 this.cpuTrace("LD F, Vx",op);
-                this.I = this.V[this.get_x(op)] * 5;
+                this.I = 0x50 + (this.V[this.get_x(op)] * 5);
                 this.PC += 2;
                 break;
             case 0x33: { /* Fx33 - LD B, Vx */
                 this.cpuTrace("LD B, Vx", op);
                 let value = this.V[this.get_x(op)];
-                this.memory[this.I] = Math.floor(value / 10);
+                this.memory[this.I] = Math.floor(value / 100);
                 this.memory[this.I + 1] = Math.floor(value / 10) % 10;
                 this.memory[this.I + 2] = value % 10;
                 this.PC += 2;
@@ -362,7 +368,7 @@ export class Chip8 {
                 this.cpuTrace("LD Vx, [i]", op);
                 let x =  this.get_x(op);
                 for (let i = 0; i <= x; i++)
-                    this.memory[this.I + i];
+                    this.V[i] = this.memory[this.I + i];
                 this.PC += 2;
                 break;
             }
@@ -370,6 +376,7 @@ export class Chip8 {
                 this.UNKNOWN_OPCODE(op);
                 break;
             }
+            break;
         default:
             this.UNKNOWN_OPCODE(op);
             break;

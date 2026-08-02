@@ -70,7 +70,7 @@ export class Keypad {
             this.press(key);
         });
         window.addEventListener("keyup",   e => {
-            const key = this.KEYS[e.key.toLowareCase()];
+            const key = this.KEYS[e.key.toLowerCase()];
 
             if (key === undefined)
                 return;
@@ -93,7 +93,7 @@ export class Keypad {
 
             e.preventDefault();
 
-            const key = parseInt(btn.dataset.key, 15);
+            const key = parseInt(btn.dataset.key, 16);
 
             btn.classList.add("pressed");
 
@@ -106,7 +106,7 @@ export class Keypad {
             if (!btn)
                 return;
 
-            e.preventDeafault();
+            e.preventDefault();
 
             const key = parseInt(btn.dataset.key, 16);
             
