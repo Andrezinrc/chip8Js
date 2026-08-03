@@ -99,6 +99,22 @@ canvas {
     -webkit-user-select: none;
 }
 
+.buttons {
+    display : flex;
+}
+
+.buttons >* {
+    flex:1;
+}
+
+#reset-rom {
+    height: 46px;
+    border: 1px solid var(--border);
+    background: var(--vid);
+    font-family: inherit;
+    cursor: pointer;
+}
+
 .controls {
     display: flex;
     flex-direction: column;

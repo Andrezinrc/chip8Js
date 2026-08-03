@@ -58,6 +58,8 @@ export class Chip8 {
     // Load rom
 
     loadRom(romData) {
+        this.rom = new Uint8Array(romData);
+
         this.cpuReset();
 
         if (romData.length > 3584) {
@@ -137,6 +139,13 @@ export class Chip8 {
     		console.log(msg);
 	}
 
+
+    restart() {
+    	if (!this.rom) return;
+
+    	this.cpuReset();
+    	this.memory.set(this.rom, 0x200);
+	}
 
     // CPU Instructions
 

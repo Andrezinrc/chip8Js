@@ -51,6 +51,10 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
     }
 });
 
+
+document.getElementById("reset-rom").addEventListener("click", () => cpu.restart());
+
+
 speedSlider.addEventListener("input", (e) => {
     const value = Number(e.target.value);
     cpu.cyclesPerFrame = value;
