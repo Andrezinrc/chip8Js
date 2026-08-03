@@ -11,6 +11,7 @@
 <body>
     <header>
         <h1>CHIP-8 Emulator</h1>
+        <button id="config-btn">⚙</button>
     </header>
 
     <main class="container">
@@ -53,6 +54,53 @@
             <button data-key="F">F</button>
         </section>
     </main>
+
+    <div id="config-overlay">
+    	<div class="config-panel">
+
+        	<h2>CONFIG</h2>
+
+        	<h3>QUIRKS</h3>
+
+        	<label>
+            	VF Reset
+            	<input type="checkbox" id="vfReset">
+        	</label>
+
+        	<label>
+            	Memory
+            	<input type="checkbox" id="memory">
+        	</label>
+
+        	<label>
+            	Clip
+            	<input type="checkbox" id="clip">
+        	</label>
+
+        	<label>
+            	Jump
+            	<input type="checkbox" id="jump">
+        	</label>
+
+        	<label>
+            	Shift
+            	<input type="checkbox" id="shift">
+        	</label>
+
+        	<h3>DEBUG</h3>
+
+        	<label>
+            	CPU Trace
+            	<input type="checkbox" id="trace">
+        	</label>
+
+            <h3>TRACE</h3>
+
+            <pre id="trace-window"></pre>
+
+        	<button id="close-config">CLOSE</button>
+		</div>
+	</div>
 
     <footer>
         <p>Build by André Moreira</p>

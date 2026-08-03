@@ -38,6 +38,19 @@ header h1 {
     text-transform: uppercase;
 }
 
+#config-btn {
+    position: absolute;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text);
+}
+
 .container {
     flex: 1;
     display: flex;
@@ -174,6 +187,73 @@ canvas {
     background: #0b0b0b;
     color: #fff;
     box-shadow: inset 0 2px 4px rgba(0,0,0,.7);
+}
+
+#config-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+#config-overlay.active {
+    display: flex;
+}
+
+.config-panel {
+    width: 90%;
+    max-width: 360px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 20px;
+}
+
+.config-panel h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.config-panel h3 {
+    font-size: .75rem;
+    letter-spacing: .15em;
+    margin: 18px 0 8px;
+}
+
+.config-panel label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 38px;
+    border-bottom: 1px solid var(--border);
+    font-size: .8rem;
+}
+
+.config-panel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+#close-config {
+    margin-top: 20px;
+    width: 100%;
+    height: 40px;
+    background: #101010;
+    color: white;
+    border: none;
+    font-family: inherit;
+}
+
+#trace-window {
+    height: 160px;
+    overflow-y: auto;
+    background: #000;
+    color: #ddd;
+    padding: 10px;
+    font-size: .7rem;
+    white-space: pre-wrap;
 }
 
 footer {

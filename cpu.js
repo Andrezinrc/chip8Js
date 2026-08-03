@@ -1,7 +1,8 @@
 import {FONTSET} from './fontset.js';
+import {DEFAULT_QUIRKS} from './quirks.js';
 
 export class Chip8 {
-    constructor(keypad) {
+    constructor(keypad, config = {}) {
         // Core
         this.memory  = new Uint8Array(4096);
         this.V       = new Uint8Array(16);
@@ -25,8 +26,18 @@ export class Chip8 {
         this.DT      = 0;
         this.ST      = 0;
 
+
+        // Quirks
+        this.quirks = {
+            ...DEFAULT_QUIRKS,
+            ...config.quirks,
+        };
+
+
         this.cyclesPerFrame = 10;
+
         this.debug   = false;
+		this.traceCallback = null;
 
         this.cpuInit();
     }
@@ -83,10 +94,23 @@ export class Chip8 {
             this.memory[i] = FONTSET[i];
     }
 
+
+    setQuirks(config) {
+    	this.quirks = {
+        	...this.quirks,
+        	...config,
+    	};
+
+    	console.log("Quirks updated:", this.quirks);
+	}
+
     // Trace
 
     cpuTrace(name, op) {
         if (!this.debug) return;
+
+		if (op === undefined)
+        	return;
 
         const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
         const opStr = op.toString(16).toUpperCase().padStart(4, '0');
@@ -98,15 +122,27 @@ export class Chip8 {
         const vyStr = this.V[y].toString(16).toUpperCase().padStart(2, '0');
         const iStr = this.I.toString(16).toUpperCase().padStart(4, '0');
 
-        console.log(`[0x${pcStr}] ${name.padEnd(10, ' ')} (0x${opStr}) |
-                    V${x.toString(16).toUpperCase()}=${vxStr},
-                    V${y.toString(16).toUpperCase()}=${vyStr}, I=${iStr}`);
-    }
+        //console.log(`[0x${pcStr}] ${name.padEnd(10, ' ')} (0x${opStr}) |
+        //            V${x.toString(16).toUpperCase()}=${vxStr},
+        //            V${y.toString(16).toUpperCase()}=${vyStr}, I=${iStr}`);
+    	
+		const msg = `[0x${pcStr}] ${name.padEnd(10,' ')} (0x${opStr})
+ 			V${x.toString(16).toUpperCase()}=${vxStr}
+ 			V${y.toString(16).toUpperCase()}=${vyStr}
+ 			I=${iStr}`;
+
+		if(this.traceCallback)
+    		this.traceCallback(msg);
+		else
+    		console.log(msg);
+	}
 
 
     // CPU Instructions
 
     cpuStep() {
+        const q =  this.quirks;
+
         let op = (this.memory[this.PC] << 8) | this.memory[this.PC + 1];
 
         /* Decode & Execute */
@@ -152,7 +188,7 @@ export class Chip8 {
             switch (this.get_n(op)) {
             case 0x0: /* 5XY0 - SE Vx, Vy */
                 this.cpuTrace("SE Vx, Vy", op);
-                this.PC += (this.V[this.get_x(op)] === this.get_y(op)) ? 4 : 2;
+                this.PC += (this.V[this.get_x(op)] === this.V[this.get_y(op)]) ? 4 : 2;
                 break;
             default:
                 this.UNKNOWN_OPCODE(op);
@@ -179,16 +215,22 @@ export class Chip8 {
             case 0x1: /* 8XY1 - OR Vx, Vy */
                 this.cpuTrace("OR Vx, Vy", op);
                 this.V[this.get_x(op)] |= this.V[this.get_y(op)];
+                if (q.vfResetQuirk)
+                    this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x2: /* 8XY2 - AND Vx, Vy */
                 this.cpuTrace("AND Vx, Vy", op);
                 this.V[this.get_x(op)] &= this.V[this.get_y(op)];
+                if (q.vfResetQuirk)
+                    this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x3: /* 8XY3 - XOR Vx, Vy */
                 this.cpuTrace("XOR Vx, Vy", op);
                 this.V[this.get_x(op)] ^= this.V[this.get_y(op)];
+                if (q.vfResetQuirk)
+                    this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x4: { /* 8XY4 - ADD Vx, Vy */
@@ -209,9 +251,11 @@ export class Chip8 {
             }
             case 0x6: { /* 8XY6 - SHR Vx {, Vy} */
                 this.cpuTrace("SHR Vx, Vy", op);
-                let f_val = this.V[this.get_x(op)] & 0x01;
-                this.V[this.get_x(op)] >>= 1;
-                this.V[0xF] = f_val;
+                const value = q.shiftQuirk
+                    ? this.V[this.get_x(op)]
+                    : this.V[this.get_y(op)];
+                this.V[0xF] = value & 0x1;
+                this.V[this.get_x(op)] = value >> 1;
                 this.PC += 2;
                 break;
             }
@@ -225,9 +269,11 @@ export class Chip8 {
             }
             case 0xE: { /* 8XYE - SHL Vx {, Vy} */
                 this.cpuTrace("SHL Vx, Vy", op);
-                let f_val = (this.V[this.get_x(op)] >> 7) & 0x01;
-                this.V[this.get_x(op)] = (this.V[this.get_x(op)] << 1) & 0xFF;
-                this.V[0xF] =  f_val;
+                const value = q.shiftQuirk
+                    ? this.V[this.get_x(op)]
+                    : this.V[this.get_y(op)];
+                this.V[0xF] =(value >> 7) & 0x1;
+                this.V[this.get_x(op)] = (value << 1) & 0xFF;
                 this.PC += 2;
                 break;
             }
@@ -247,7 +293,10 @@ export class Chip8 {
             break;
         case 0xB000: /* BNNN - JP V0, addr */
             this.cpuTrace("JP V0, addr", op);
-            this.PC = this.get_nnn(op) + this.V[0x0];
+            if (q.jumpQuirk)
+                this.PC = this.get_nnn(op) + this.V[this.get_x(op)];
+            else
+                this.PC = this.get_nnn(op) + this.V[0x0];
             break;
         case 0xC000: /* CXKK - RND Vx, byte */
             this.cpuTrace("RND Vx, Vy", op);
@@ -272,12 +321,18 @@ export class Chip8 {
                         let px = x + col;
                         let py = y + row;
 
-                        if (px < 64 && py < 32) {
-                            let vid_index = px + (py * 64);
-                            if (this.video[vid_index] === 1)
-                                this.V[0xF] = 1;
-                            this.video[vid_index] ^= 1;
+                        if (q.clipQuirk) {
+                            if (px >= 64 || py >= 32)
+                                continue;
+                        } else {
+                            px %= 64;
+                            py %= 32;
                         }
+
+                        let vid_index = px + (py * 64);
+                        if (this.video[vid_index] === 1)
+                            this.V[0xF] = 1;
+                        this.video[vid_index] ^= 1;
                     }
                 }
             }
@@ -315,7 +370,7 @@ export class Chip8 {
             //);
             switch (this.get_kk(op)) {
             case 0x07: /* FX07 - LD Vx, DT */
-                this.cpuTrace("LD Vx, DT");
+                this.cpuTrace("LD Vx, DT", op);
                 this.V[this.get_x(op)] = this.DT;
                 this.PC += 2;
                 break;
@@ -380,6 +435,8 @@ export class Chip8 {
                 let x = this.get_x(op);
                 for (let i = 0; i <= x; i++)
                     this.memory[this.I + i] = this.V[i];
+                if (q.memoryQuirk)
+                    this.I += x + 1;
                 this.PC += 2;
                 break;
             }
@@ -388,6 +445,8 @@ export class Chip8 {
                 let x =  this.get_x(op);
                 for (let i = 0; i <= x; i++)
                     this.V[i] = this.memory[this.I + i];
+                if (q.memoryQuirk)
+                    this.I += x + 1;
                 this.PC += 2;
                 break;
             }
