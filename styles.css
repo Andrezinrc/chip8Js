@@ -33,7 +33,7 @@ header {
 
 header h1 {
     font-size: 1rem;
-    font-height: 550;
+    font-weight: 550;
     letter-spacing: .15em;
     text-transform: uppercase;
 }
@@ -112,7 +112,10 @@ canvas {
     border: 1px solid var(--border);
     background: var(--vid);
     font-family: inherit;
+    font-size: inherit;
+    color: var(--text);
     cursor: pointer;
+    transition: .15s;
 }
 
 .controls {
