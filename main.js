@@ -1,5 +1,6 @@
 import {Chip8} from './cpu.js';
 import {Video} from './video.js';
+import {Audio} from './audio.js';
 import {Keypad} from './keypad.js';
 import {loadQuirkUI, readQuirkUI} from "./config.js";
 import "./theme.js";
@@ -10,6 +11,9 @@ const ctx = canvas.getContext("2d");
 const keypad = new Keypad();
 const cpu = new Chip8(keypad);
 const video = new Video(ctx);
+const audio = new Audio();
+
+canvas.addEventListener("pointerdown", ()=>audio.init(), {once:true});
 
 loadQuirkUI(cpu.quirks);
 
@@ -32,6 +36,8 @@ const speedSlider = document.getElementById("speed");
 const speedValue = document.getElementById("speed-value");
 
 document.getElementById("rom-upload").addEventListener("change", async(event)  => {
+    await audio.init();
+
     const file =  event.target.files[0];
     if (!file) return;
 
@@ -54,7 +60,6 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
 
 document.getElementById("reset-rom").addEventListener("click", () => cpu.restart());
 
-
 speedSlider.addEventListener("input", (e) => {
     const value = Number(e.target.value);
     cpu.cyclesPerFrame = value;
@@ -75,6 +80,12 @@ document.querySelector("#trace").addEventListener("change",(e)=>{
 function mainLoop()
 {
     cpu.cpuCycle();
+
+    if (cpu.ST > 0)
+        audio.play();
+    else
+        audio.stop();
+    
     video.render(cpu);
     animationId = requestAnimationFrame(mainLoop);
 }
