@@ -1,4 +1,4 @@
-const CACHE_NAME = "chip8-v5";
+const CACHE_NAME = "chip8-v6";
 
 const FILES = [
     "./",
@@ -8,6 +8,8 @@ const FILES = [
     "./video.js",
     "./keypad.js",
     "./fontset.js",
+    "./config.js",
+    "./quirks.js",
     "./styles.css",
     "./manifest.json"
 ];
