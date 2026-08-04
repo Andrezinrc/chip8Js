@@ -341,6 +341,16 @@ footer {
     -webkit-tap-highlight-color: transparent;
 }
 
+footer a {
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+}
+
+footer a:hover {
+    opacity: .7;
+}
+
 @media (max-width: 768px) {
     body { min-height: 100dvh; }
 
