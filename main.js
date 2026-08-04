@@ -1,8 +1,8 @@
 import {Chip8} from './cpu.js';
 import {Video} from './video.js';
 import {Keypad} from './keypad.js';
-
 import {loadQuirkUI, readQuirkUI} from "./config.js";
+import "./theme.js";
 
 const canvas =  document.getElementById("screen");
 const ctx = canvas.getContext("2d");

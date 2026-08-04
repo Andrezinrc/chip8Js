@@ -24,11 +24,26 @@ body {
     -webkit-user-select: none;
 }
 
+body.theme-plum {
+    --bg: #2b2436;
+    --vid: #372d45;
+    --border: #57476c;
+    --text: #ece7f8;
+}
+
+body.theme-slate {
+    --bg: #20262e;
+    --vid: #2b343e;
+    --border: #495766;
+    --text: #eef3f7;
+}
+
 header {
     flex: 0 0 52px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 header h1 {
@@ -36,6 +51,45 @@ header h1 {
     font-weight: 550;
     letter-spacing: .15em;
     text-transform: uppercase;
+}
+
+.theme-picker {
+    position: absolute;
+    left: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-btn {
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(0,0,0,.35);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform .12s;
+    padding: 0;
+}
+
+.theme-btn:hover {
+    transform: scale(1.1);
+}
+
+.theme-btn.active {
+    outline: 1px solid var(--text);
+    outline-offset: 2px;
+}
+
+.theme-btn[data-theme="classic"] {
+    background: #bfbfb8;
+}
+
+.theme-btn[data-theme="plum"] {
+    background: #6b4b8a;
+}
+
+.theme-btn[data-theme="slate"] {
+    background: #465468;
 }
 
 #config-btn {
