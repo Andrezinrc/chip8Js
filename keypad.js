@@ -34,6 +34,7 @@ export class Keypad {
     press(key) {
         this.keys[key] = 1;
 
+        // Resolve the pending Fx0A instruction as soon as any key is pressed
         if (this.waitingResolver !== null) {
             this.waitingResolver(key);
             this.waitingResolver =  null;
@@ -92,6 +93,8 @@ export class Keypad {
                 return;
 
             e.preventDefault();
+
+            navigator.vibrate?.(5);
 
             const key = parseInt(btn.dataset.key, 16);
 

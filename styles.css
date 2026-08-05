@@ -6,6 +6,8 @@
     box-sizing: border-box;
 }
 
+/* Theme */
+
 :root {
     --bg: #d4d4d4;
     --vid: #c7c7c2;
@@ -37,6 +39,8 @@ body.theme-slate {
     --border: #495766;
     --text: #eef3f7;
 }
+
+/* Header */
 
 header {
     flex: 0 0 52px;
@@ -105,6 +109,8 @@ header h1 {
     color: var(--text);
 }
 
+/* Layout */
+
 .container {
     flex: 1;
     display: flex;
@@ -131,6 +137,8 @@ canvas {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
 }
+
+/* Controls */
 
 .controls {
     display: flex;
@@ -170,6 +178,18 @@ canvas {
     color: var(--text);
     cursor: pointer;
     transition: .15s;
+}
+
+.upload span,
+#reset-rom {
+    border-bottom: 1px solid var(--border);
+    transition: transform .05s, filter .08s;
+}
+
+.upload span:active,
+#reset-rom:active {
+    transform: translateY(1px);
+    filter: brightness(.95);
 }
 
 .controls {
@@ -228,6 +248,8 @@ canvas {
     cursor: pointer;
 }
 
+/* Mobile keypad */
+
 .keypad {
     display: none;
     grid-template-columns: repeat(4,1fr);
@@ -261,6 +283,8 @@ canvas {
     color: #fff;
     box-shadow: inset 0 2px 4px rgba(0,0,0,.7);
 }
+
+/* Configuration */
 
 #config-overlay {
     display: none;
@@ -329,6 +353,8 @@ canvas {
     white-space: pre-wrap;
 }
 
+/* Footer */
+
 footer {
     margin-top: auto;
     text-align: center;
@@ -350,6 +376,8 @@ footer a {
 footer a:hover {
     opacity: .7;
 }
+
+/* Mobile */
 
 @media (max-width: 768px) {
     body { min-height: 100dvh; }

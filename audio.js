@@ -6,6 +6,8 @@ export class Audio {
         this.started = false;
     }
 
+    // Browsers only allow audio playback after a user interaction.
+    // Keep a single AudioContext alive and resume it when necessary.
     async init() {
         if (this.started) {
             if (this.ctx.state !== "running")
@@ -31,6 +33,9 @@ export class Audio {
         this.osc.connect(this.gain);
         this.gain.connect(this.ctx.destination);
 
+        // Keep the oscillator running continuously and control the
+        // beep by adjusting the gain instead of starting and
+        // stopping the oscillator every time.
         this.osc.start();
 
         this.started = true;

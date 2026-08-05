@@ -13,6 +13,7 @@ const cpu = new Chip8(keypad);
 const video = new Video(ctx);
 const audio = new Audio();
 
+// Unlock audio on the first user interaction
 canvas.addEventListener("pointerdown", ()=>audio.init(), {once:true});
 
 loadQuirkUI(cpu.quirks);
@@ -77,6 +78,7 @@ document.querySelector("#trace").addEventListener("change",(e)=>{
     cpu.debug = e.target.checked;
 });
 
+// Execute one emulator frame
 function mainLoop()
 {
     cpu.cpuCycle();

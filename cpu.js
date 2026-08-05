@@ -103,7 +103,7 @@ export class Chip8 {
         	...config,
     	};
 
-    	console.log("Quirks updated:", this.quirks);
+    	//console.log("Quirks updated:", this.quirks);
 	}
 
     // Trace
