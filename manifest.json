@@ -8,7 +8,7 @@
     "description": "A CHIP-8 emulator running in the browser",
     "icons": [
         {
-            "src": "icon.png",
+            "src": "images/icon.png",
             "sizes": "512x512",
             "type": "image/png"
         }

@@ -1,20 +1,20 @@
-const CACHE_NAME = "chip8-v11";
+const CACHE_NAME = "chip8-v12";
 
 const FILES = [
     "./",
     "./index.html",
     "./main.js",
-    "./cpu.js",
-    "./video.js",
-    "./audio.js",
-    "./keypad.js",
-    "./fontset.js",
-    "./config.js",
-    "./quirks.js",
+    "./src/core/cpu.js",
+    "./src/devices/video.js",
+    "./src/devices/audio.js",
+    "./src/devices/keypad.js",
+    "./src/assets/fontset.js",
+    "./src/system/config.js",
+    "./src/system/quirks.js",
     "./theme.js",
     "./styles.css",
     "./manifest.json",
-    "./icon.png",
+    "./images/icon.png",
 ];
 
 
