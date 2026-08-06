@@ -1,8 +1,8 @@
-import {Chip8} from './cpu.js';
-import {Video} from './video.js';
-import {Audio} from './audio.js';
-import {Keypad} from './keypad.js';
-import {loadQuirkUI, readQuirkUI} from "./config.js";
+import {Chip8} from './src/core/cpu.js';
+import {Video} from './src/devices/video.js';
+import {Audio} from './src/devices/audio.js';
+import {Keypad} from './src/devices/keypad.js';
+import {loadQuirkUI, readQuirkUI} from "./src/system/config.js";
 import "./theme.js";
 
 const canvas =  document.getElementById("screen");

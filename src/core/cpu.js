@@ -1,5 +1,5 @@
-import {FONTSET} from './fontset.js';
-import {DEFAULT_QUIRKS} from './quirks.js';
+import {FONTSET} from '../assets/fontset.js';
+import {DEFAULT_QUIRKS} from '../system/quirks.js';
 
 export class Chip8 {
     constructor(keypad, config = {}) {
