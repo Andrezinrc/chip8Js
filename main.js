@@ -32,6 +32,8 @@ cpu.traceCallback = (msg)=>{
 };
 
 let animationId = null;
+let paused = false;
+let lastSoundState = false;
 
 const speedSlider = document.getElementById("speed");
 const speedValue = document.getElementById("speed-value");
@@ -60,8 +62,6 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
 
 
 document.getElementById("reset-rom").addEventListener("click", () => cpu.restart());
-
-let paused = false;
 
 let pauseRom = document.getElementById("pause-rom");
 
