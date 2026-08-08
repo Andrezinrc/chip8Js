@@ -61,6 +61,21 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
 
 document.getElementById("reset-rom").addEventListener("click", () => cpu.restart());
 
+let paused = false;
+
+let pauseRom = document.getElementById("pause-rom");
+
+pauseRom.addEventListener("click", () => {
+    if (!paused) {
+	paused = true;
+	pauseRom.innerText = "RESUME";
+    } else {
+	paused = false;
+	pauseRom.innerText = "PAUSE";
+    }
+});
+
+
 speedSlider.addEventListener("input", (e) => {
     const value = Number(e.target.value);
     cpu.cyclesPerFrame = value;
@@ -81,13 +96,26 @@ document.querySelector("#trace").addEventListener("change",(e)=>{
 // Execute one emulator frame
 function mainLoop()
 {
-    cpu.cpuCycle();
+    if (!paused) {
+        cpu.cpuCycle();
 
-    if (cpu.ST > 0)
-        audio.play();
-    else
-        audio.stop();
-    
+        const soundOn = cpu.ST > 0;
+
+        if (soundOn !== lastSoundState) {
+            if (soundOn)
+                audio.play();
+            else
+                audio.stop();
+
+            lastSoundState = soundOn;
+        }
+    } else {
+        if (lastSoundState) {
+            audio.stop();
+            lastSoundState = false;
+        }
+    }
+
     video.render(cpu);
     animationId = requestAnimationFrame(mainLoop);
 }

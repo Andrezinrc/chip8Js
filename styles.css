@@ -169,7 +169,8 @@ canvas {
     flex:1;
 }
 
-#reset-rom {
+#reset-rom,
+#pause-rom {
     height: 46px;
     border: 1px solid var(--border);
     background: var(--vid);
@@ -181,13 +182,15 @@ canvas {
 }
 
 .upload span,
-#reset-rom {
+#reset-rom,
+#pause-rom {
     border-bottom: 1px solid var(--border);
     transition: transform .05s, filter .08s;
 }
 
 .upload span:active,
-#reset-rom:active {
+#reset-rom:active, 
+#pause-rom:active {
     transform: translateY(1px);
     filter: brightness(.95);
 }
