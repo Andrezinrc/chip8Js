@@ -37,7 +37,7 @@ export class Chip8 {
         this.cyclesPerFrame = 10;
 
         this.debug   = false;
-		this.traceCallback = null;
+	this.traceCallback = null;
 
         this.cpuInit();
     }
@@ -104,15 +104,15 @@ export class Chip8 {
     	};
 
     	//console.log("Quirks updated:", this.quirks);
-	}
+    }
 
     // Trace
 
     cpuTrace(name, op) {
         if (!this.debug) return;
-
-		if (op === undefined)
-        	return;
+	
+	if (op === undefined)
+	    return;
 
         const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
         const opStr = op.toString(16).toUpperCase().padStart(4, '0');
@@ -124,20 +124,16 @@ export class Chip8 {
         const vyStr = this.V[y].toString(16).toUpperCase().padStart(2, '0');
         const iStr = this.I.toString(16).toUpperCase().padStart(4, '0');
 
-        //console.log(`[0x${pcStr}] ${name.padEnd(10, ' ')} (0x${opStr}) |
-        //            V${x.toString(16).toUpperCase()}=${vxStr},
-        //            V${y.toString(16).toUpperCase()}=${vyStr}, I=${iStr}`);
-    	
-		const msg = `[0x${pcStr}] ${name.padEnd(10,' ')} (0x${opStr})
+	const msg = `[0x${pcStr}] ${name.padEnd(10,' ')} (0x${opStr})
  			V${x.toString(16).toUpperCase()}=${vxStr}
  			V${y.toString(16).toUpperCase()}=${vyStr}
  			I=${iStr}`;
-
-		if(this.traceCallback)
-    		this.traceCallback(msg);
-		else
-    		console.log(msg);
-	}
+        
+	if(this.traceCallback)
+    	    this.traceCallback(msg);
+	else
+	    console.log(msg);
+    }
 
 
     restart() {
@@ -145,7 +141,7 @@ export class Chip8 {
 
     	this.cpuReset();
     	this.memory.set(this.rom, 0x200);
-	}
+    }
 
     // CPU Instructions
 
