@@ -136,6 +136,10 @@ canvas {
     background: #000;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.12),
+        0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
 /* Controls */
@@ -186,6 +190,8 @@ canvas {
 #pause-rom {
     border-bottom: 1px solid var(--border);
     transition: transform .05s, filter .08s;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .upload span:active,
@@ -308,6 +314,9 @@ canvas {
     max-width: 360px;
     background: var(--bg);
     border: 1px solid var(--border);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, .12),
+        0 10px 30px rgba(0, 0, 0, .18);
     padding: 20px;
 }
 
@@ -344,6 +353,10 @@ canvas {
     color: white;
     border: none;
     font-family: inherit;
+    box-shadow:
+        0 2px 0 #050505,
+        0 4px 8px rgba(0, 0, 0, .12);
+    transition: transform .05s, filter .08s
 }
 
 #trace-window {
