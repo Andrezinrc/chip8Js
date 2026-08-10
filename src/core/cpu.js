@@ -37,13 +37,21 @@ export class Chip8 {
         this.cyclesPerFrame = 10;
 
         this.debug   = false;
-	this.traceCallback = null;
+    	this.traceCallback = null;
 
         this.cpuInit();
     }
 
     UNKNOWN_OPCODE(op) {
-        console.log(`Unknown opcode: 0x${op.toString(16)}`);
+        const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
+        const opStr = op.toString(16).toUpperCase().padStart(4, '0');
+    
+        const msg = `[0x${pcStr}] UNKNOWN    (0x${opStr})`;
+    
+        if (this.traceCallback)
+            this.traceCallback(msg);
+        else
+            console.log(msg);
     }
 
 
@@ -110,9 +118,9 @@ export class Chip8 {
 
     cpuTrace(name, op) {
         if (!this.debug) return;
-	
-	if (op === undefined)
-	    return;
+        
+        if (op === undefined)
+    	    return;
 
         const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
         const opStr = op.toString(16).toUpperCase().padStart(4, '0');
@@ -123,16 +131,16 @@ export class Chip8 {
         const vxStr = this.V[x].toString(16).toUpperCase().padStart(2, '0');
         const vyStr = this.V[y].toString(16).toUpperCase().padStart(2, '0');
         const iStr = this.I.toString(16).toUpperCase().padStart(4, '0');
-
-	const msg = `[0x${pcStr}] ${name.padEnd(10,' ')} (0x${opStr})
+        
+        const msg = `[0x${pcStr}] ${name.padEnd(10,' ')} (0x${opStr})
  			V${x.toString(16).toUpperCase()}=${vxStr}
  			V${y.toString(16).toUpperCase()}=${vyStr}
  			I=${iStr}`;
         
-	if(this.traceCallback)
+        if (this.traceCallback)
     	    this.traceCallback(msg);
-	else
-	    console.log(msg);
+    	else
+    	    console.log(msg);
     }
 
 
