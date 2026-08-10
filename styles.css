@@ -264,8 +264,8 @@ canvas {
 .keypad {
     display: none;
     grid-template-columns: repeat(4, 1fr);
-    gap: 9px;
-    padding: 14px;
+    gap: 8px;
+    padding: 10px;
     background:
         linear-gradient(
             145deg,
@@ -474,7 +474,7 @@ footer a:hover {
 
     .keypad {
         display: grid;
-        flex: 0 0 264px;
+        flex: 0 0 232px;
         grid-template-columns: repeat(4, 1fr);
     }
 
