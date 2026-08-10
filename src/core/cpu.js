@@ -105,6 +105,8 @@ export class Chip8 {
 
         for (let i = 0; i < FONTSET.length; i++)
             this.memory[i] = FONTSET[i];
+        
+        this.halted = false;
     }
 
 
