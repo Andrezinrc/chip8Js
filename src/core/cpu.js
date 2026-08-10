@@ -37,7 +37,8 @@ export class Chip8 {
         this.cyclesPerFrame = 10;
 
         this.debug   = false;
-    	this.traceCallback = null;
+        this.traceCallback = null;
+        this.halted = false;
 
         this.cpuInit();
     }
@@ -52,6 +53,8 @@ export class Chip8 {
             this.traceCallback(msg);
         else
             console.log(msg);
+        
+        this.halted = true;
     }
 
 
@@ -154,6 +157,8 @@ export class Chip8 {
     // CPU Instructions
 
     cpuStep() {
+        if (this.halted) return;
+        
         const q =  this.quirks;
 
         let op = (this.memory[this.PC] << 8) | this.memory[this.PC + 1];
