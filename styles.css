@@ -96,9 +96,9 @@ header h1 {
     background: #465468;
 }
 
-#config-btn {
+#config-btn,
+#debug-btn {
     position: absolute;
-    right: 14px;
     width: 32px;
     height: 32px;
     border: none;
@@ -107,6 +107,14 @@ header h1 {
     font-size: 1.2rem;
     cursor: pointer;
     color: var(--text);
+}
+
+#config-btn {
+    right: 50px;
+}
+
+#debug-btn {
+    right: 14px;
 }
 
 /* Layout */
@@ -341,7 +349,8 @@ canvas {
 
 /* Configuration */
 
-#config-overlay {
+#config-overlay,
+#debug-overlay {
     display: none;
     position: fixed;
     inset: 0;
@@ -351,7 +360,8 @@ canvas {
     justify-content: center;
 }
 
-#config-overlay.active {
+#config-overlay.active,
+#debug-overlay.active {
     display: flex;
 }
 
@@ -391,7 +401,8 @@ canvas {
     height: 18px;
 }
 
-#close-config {
+#close-config,
+#close-debug {
     margin-top: 20px;
     width: 100%;
     height: 40px;
@@ -413,6 +424,63 @@ canvas {
     padding: 10px;
     font-size: .7rem;
     white-space: pre-wrap;
+}
+
+/* Debug */
+
+.debug-panel {
+    max-width: 520px;
+}
+
+.cpu-registers {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.cpu-registers > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    background: var(--vid);
+    border: 1px solid var(--border);
+}
+
+.cpu-registers span,
+.v-registers span {
+    font-size: .65rem;
+    opacity: .7;
+}
+
+.cpu-registers strong,
+.v-registers strong {
+    font-size: .8rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.v-registers {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+}
+
+.v-registers > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    background: var(--vid);
+    border: 1px solid var(--border);
+}
+
+.debug-panel #trace-window {
+    height: 180px;
+    margin-top: 8px;
+    border: 1px solid var(--border);
 }
 
 /* Footer */
@@ -480,5 +548,33 @@ footer a:hover {
 
     .keypad button {
         height: 58px;
+    }
+
+    .debug-panel {
+        max-width: none;
+        width: 95%;
+        padding: 14px;
+    }
+
+    .cpu-registers {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+    }
+
+    .v-registers {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+
+    .cpu-registers > div {
+        min-height: 42px;
+    }
+
+    .v-registers > div {
+        min-height: 40px;
+    }
+
+    .debug-panel #trace-window {
+        height: 150px;
     }
 }

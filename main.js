@@ -18,10 +18,43 @@ canvas.addEventListener("pointerdown", ()=>audio.init(), {once:true});
 
 loadQuirkUI(cpu.quirks);
 
+const configOverlay = document.querySelector("#config-overlay");
+const debugOverlay = document.querySelector("#debug-overlay");
+
+const configBtn = document.querySelector("#config-btn");
+const debugBtn = document.querySelector("#debug-btn");
+
+const closeConfig = document.querySelector("#close-config");
+const closeDebug = document.querySelector("#close-debug");
+
+configBtn.addEventListener("click", () => {
+    configOverlay.classList.add("active");
+});
+
+debugBtn.addEventListener("click", () => {
+    debugOverlay.classList.add("active");
+});
+
+closeConfig.addEventListener("click", () => {
+    configOverlay.classList.remove("active");
+});
+
+closeDebug.addEventListener("click", () => {
+    debugOverlay.classList.remove("active");
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape")
+        return;
+
+    configOverlay.classList.remove("active");
+    debugOverlay.classList.remove("active");
+});
+
 const traceWindow = document.querySelector("#trace-window");
 
 cpu.traceCallback = (msg)=>{
-    const lines = traceWindow.textContent.split("\n"); 
+    const lines = traceWindow.textContent.split("\n");
 
     lines.push(msg);
 
@@ -29,7 +62,28 @@ cpu.traceCallback = (msg)=>{
         lines.shift();
 
     traceWindow.textContent = lines.join("\n");
+    traceWindow.scrollTop = traceWindow.scrollHeight;
 };
+
+function toHex(value, digits) {
+    return value.toString(16).toUpperCase().padStart(digits, "0");
+}
+
+function updateDebugState() {
+    document.querySelector("#debug-pc").textContent = toHex(cpu.PC, 4);
+    document.querySelector("#debug-i").textContent = toHex(cpu.I, 4);
+    document.querySelector("#debug-sp").textContent = toHex(cpu.SP, 2);
+    document.querySelector("#debug-dt").textContent = toHex(cpu.DT, 2);
+    document.querySelector("#debug-st").textContent = toHex(cpu.ST, 2);
+
+    for (let i = 0; i < 16; i++) {
+        const register = document.querySelector(
+            `#debug-v${i.toString(16)}`
+        );
+
+        register.textContent = toHex(cpu.V[i], 2);
+    }
+}
 
 let animationId = null;
 let paused = false;
@@ -60,26 +114,26 @@ document.getElementById("rom-upload").addEventListener("change", async(event)  =
     }
 });
 
-
 document.getElementById("reset-rom").addEventListener("click", () => cpu.restart());
 
 let pauseRom = document.getElementById("pause-rom");
 
 pauseRom.addEventListener("click", () => {
     if (!paused) {
-	paused = true;
-	pauseRom.innerText = "RESUME";
+        paused = true;
+        pauseRom.innerText = "RESUME";
     } else {
-	paused = false;
-	pauseRom.innerText = "PAUSE";
+        paused = false;
+        pauseRom.innerText = "PAUSE";
     }
 });
 
-
 speedSlider.addEventListener("input", (e) => {
-    const value = Number(e.target.value);
-    cpu.cyclesPerFrame = value;
-    speedValue.textContent = `${value}x`;
+    const cycles = Number(e.target.value);
+    cpu.cyclesPerFrame = cycles;
+
+    const hz = cycles * 60;
+    speedValue.textContent = `${hz} Hz`;
 });
 
 document.querySelectorAll("#config-overlay input[type=checkbox]").forEach(input => {
@@ -117,5 +171,7 @@ function mainLoop()
     }
 
     video.render(cpu);
+    updateDebugState();
+
     animationId = requestAnimationFrame(mainLoop);
 }

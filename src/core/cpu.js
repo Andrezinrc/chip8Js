@@ -137,10 +137,13 @@ export class Chip8 {
         const vyStr = this.V[y].toString(16).toUpperCase().padStart(2, '0');
         const iStr = this.I.toString(16).toUpperCase().padStart(4, '0');
         
-        const msg = `[0x${pcStr}] ${name.padEnd(10,' ')} (0x${opStr})
- 			V${x.toString(16).toUpperCase()}=${vxStr}
- 			V${y.toString(16).toUpperCase()}=${vyStr}
- 			I=${iStr}`;
+        const msg =
+    		`0x${pcStr} ` +
+    		`${opStr} ` +
+    		`${name.padEnd(10, ' ')}   ` +
+    		`V${x.toString(16).toUpperCase()}=${vxStr} ` +
+    		`V${y.toString(16).toUpperCase()}=${vyStr} ` +
+    		`I=${iStr}`;
         
         if (this.traceCallback)
     	    this.traceCallback(msg);

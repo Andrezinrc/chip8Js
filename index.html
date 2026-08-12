@@ -11,14 +11,15 @@
 <body>
     <header>
     	<div class="theme-picker">
-        	<button class="theme-btn active" data-theme="classic" aria-label="Classic"></button>
-        	<button class="theme-btn" data-theme="plum" aria-label="Plum"></button>
-        	<button class="theme-btn" data-theme="slate" aria-label="Slate"></button>
+	    <button class="theme-btn active" data-theme="classic" aria-label="Classic"></button>
+	    <button class="theme-btn" data-theme="plum" aria-label="Plum"></button>
+	    <button class="theme-btn" data-theme="slate" aria-label="Slate"></button>
     	</div>
 
     	<h1>CHIP-8 Emulator</h1>
     	<button id="config-btn">⚙</button>
-	</header>
+	<button id="debug-btn">⌘</button>
+    </header>
 
     <main class="container">
         <section class="video">
@@ -33,14 +34,14 @@
                 </label>
 
                 <button id="reset-rom">RESET</button>
-		<button id="pause-rom">PAUSE</button>
+                <button id="pause-rom">PAUSE</button>
             </div>
 
             <div class="speed-control">
-    		<span>Speed</span>
-    		<input type="range" id="speed" min="1" max="30" value="10">
-    		<span id="speed-value">10x</span>
-	    </div>
+                <span>Speed</span>
+                <input type="range" id="speed" min="5" max="50" value="10">
+        		<span id="speed-value">600 Hz</span>
+    	    </div>
         </section>
 
         <!-- Mobile keypad -->
@@ -100,19 +101,81 @@
             	<input type="checkbox" id="shift">
         	</label>
 
-        	<h3>DEBUG</h3>
+        	<button id="close-config">CLOSE</button>
+		</div>
+	</div>
+
+	<!-- Debug modal -->
+	<div id="debug-overlay">
+    	<div class="config-panel debug-panel">
+
+        	<h2>DEBUG</h2>
+
+        	<h3>CPU STATE</h3>
+
+        	<div class="cpu-registers">
+            	<div>
+                	<span>PC</span>
+                	<strong id="debug-pc">0200</strong>
+            	</div>
+
+            	<div>
+                	<span>I</span>
+                	<strong id="debug-i">0000</strong>
+            	</div>
+
+            	<div>
+                	<span>SP</span>
+                	<strong id="debug-sp">00</strong>
+            	</div>
+
+            	<div>
+                	<span>DT</span>
+                	<strong id="debug-dt">00</strong>
+            	</div>
+
+            	<div>
+                	<span>ST</span>
+                	<strong id="debug-st">00</strong>
+            	</div>
+        	</div>
+
+
+        	<div class="v-registers">
+            	<div><span>V0</span><strong id="debug-v0">00</strong></div>
+            	<div><span>V1</span><strong id="debug-v1">00</strong></div>
+            	<div><span>V2</span><strong id="debug-v2">00</strong></div>
+            	<div><span>V3</span><strong id="debug-v3">00</strong></div>
+
+            	<div><span>V4</span><strong id="debug-v4">00</strong></div>
+            	<div><span>V5</span><strong id="debug-v5">00</strong></div>
+            	<div><span>V6</span><strong id="debug-v6">00</strong></div>
+            	<div><span>V7</span><strong id="debug-v7">00</strong></div>
+
+            	<div><span>V8</span><strong id="debug-v8">00</strong></div>
+            	<div><span>V9</span><strong id="debug-v9">00</strong></div>
+            	<div><span>VA</span><strong id="debug-va">00</strong></div>
+            	<div><span>VB</span><strong id="debug-vb">00</strong></div>
+
+            	<div><span>VC</span><strong id="debug-vc">00</strong></div>
+            	<div><span>VD</span><strong id="debug-vd">00</strong></div>
+            	<div><span>VE</span><strong id="debug-ve">00</strong></div>
+            	<div><span>VF</span><strong id="debug-vf">00</strong></div>
+        	</div>
+
+
+        	<h3>TRACE</h3>
 
         	<label>
             	CPU Trace
             	<input type="checkbox" id="trace">
         	</label>
 
-            <h3>TRACE</h3>
+        	<pre id="trace-window"></pre>
 
-            <pre id="trace-window"></pre>
+        	<button id="close-debug">CLOSE</button>
 
-        	<button id="close-config">CLOSE</button>
-		</div>
+    	</div>
 	</div>
 
     <footer>
