@@ -416,16 +416,6 @@ canvas {
     transition: transform .05s, filter .08s;
 }
 
-#trace-window {
-    height: 160px;
-    overflow-y: auto;
-    background: #000;
-    color: #ddd;
-    padding: 10px;
-    font-size: .7rem;
-    white-space: pre-wrap;
-}
-
 /* Debug */
 
 .debug-panel {
@@ -474,12 +464,6 @@ canvas {
     justify-content: center;
     min-height: 42px;
     background: var(--vid);
-    border: 1px solid var(--border);
-}
-
-.debug-panel #trace-window {
-    height: 180px;
-    margin-top: 8px;
     border: 1px solid var(--border);
 }
 
@@ -572,9 +556,5 @@ footer a:hover {
 
     .v-registers > div {
         min-height: 40px;
-    }
-
-    .debug-panel #trace-window {
-        height: 150px;
     }
 }

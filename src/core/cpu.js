@@ -36,26 +36,13 @@ export class Chip8 {
 
         this.cyclesPerFrame = 10;
 
-        this.debug   = false;
-        this.traceCallback = null;
         this.halted = false;
 
         this.cpuInit();
     }
 
-    UNKNOWN_OPCODE(op) {
-        const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
-        const opStr = op.toString(16).toUpperCase().padStart(4, '0');
-    
-        const msg = `[0x${pcStr}] UNKNOWN    (0x${opStr})`;
-    
-        if (this.traceCallback)
-            this.traceCallback(msg);
-        else
-            console.log(msg);
-        
-        this.halted = true;
-    }
+
+    UNKNOWN_OPCODE(op) {    console.log(`UNKNOWN OPCODE ${op}`);    }
 
 
     // Instruction operand extractors
@@ -119,38 +106,6 @@ export class Chip8 {
     	//console.log("Quirks updated:", this.quirks);
     }
 
-    // Trace
-
-    cpuTrace(name, op) {
-        if (!this.debug) return;
-        
-        if (op === undefined)
-    	    return;
-
-        const pcStr = this.PC.toString(16).toUpperCase().padStart(3, '0');
-        const opStr = op.toString(16).toUpperCase().padStart(4, '0');
-        
-        const x = this.get_x(op);
-        const y = this.get_y(op);
-        
-        const vxStr = this.V[x].toString(16).toUpperCase().padStart(2, '0');
-        const vyStr = this.V[y].toString(16).toUpperCase().padStart(2, '0');
-        const iStr = this.I.toString(16).toUpperCase().padStart(4, '0');
-        
-        const msg =
-    		`0x${pcStr} ` +
-    		`${opStr} ` +
-    		`${name.padEnd(10, ' ')}   ` +
-    		`V${x.toString(16).toUpperCase()}=${vxStr} ` +
-    		`V${y.toString(16).toUpperCase()}=${vyStr} ` +
-    		`I=${iStr}`;
-        
-        if (this.traceCallback)
-    	    this.traceCallback(msg);
-    	else
-    	    console.log(msg);
-    }
-
 
     restart() {
     	if (!this.rom) return;
@@ -173,44 +128,44 @@ export class Chip8 {
         case 0x0000:
             switch (this.get_kk(op)) {
             case 0x00E0: /* CLS */
-                this.cpuTrace("CLS", op);
+                //this.trace("CLS", op);
                 this.video.fill(0);
                 this.PC += 2;
                 break;
             case 0x00EE: /* RET */
-                this.cpuTrace("RET", op);
+                //this.trace("RET", op);
                 this.SP--;
                 this.PC = this.stack[this.SP];
                 this.PC += 2;
                 break;
             default: /* SYS */
-                this.cpuTrace("SYS", op);
+                //this.trace("SYS", op);
                 this.PC += 2;
                 break;
             }
             break;
         case 0x1000: /* 1NNN - JP addr */
-            this.cpuTrace("JP", op);
+            //this.trace("JP", op);
             this.PC = this.get_nnn(op);
             break;
         case 0x2000: /* 2NNN - CALL addr */
-            this.cpuTrace("CALL", op);
+            //this.trace("CALL", op);
             this.stack[this.SP] = this.PC;
             this.SP++;
             this.PC = this.get_nnn(op);
             break;
         case 0x3000: /* 3XKK - SE Vx, byte */
-            this.cpuTrace("SE Vx, byte", op);
+            //this.trace("SE Vx, byte", op);
             this.PC += (this.V[this.get_x(op)] == this.get_kk(op)) ? 4 : 2;
             break;
         case 0x4000: /* 4XKK - SNE Vx, byte */
-            this.cpuTrace("SNE Vx, byte",op);
+            //this.trace("SNE Vx, byte",op);
             this.PC += (this.V[this.get_x(op)] != this.get_kk(op)) ? 4 : 2;
             break;
         case 0x5000:
             switch (this.get_n(op)) {
             case 0x0: /* 5XY0 - SE Vx, Vy */
-                this.cpuTrace("SE Vx, Vy", op);
+                //this.trace("SE Vx, Vy", op);
                 this.PC += (this.V[this.get_x(op)] === this.V[this.get_y(op)]) ? 4 : 2;
                 break;
             default:
@@ -219,45 +174,45 @@ export class Chip8 {
             }
             break;
         case 0x6000: /* 6XKK - LD Vx, byte */
-            this.cpuTrace("LD Vx, byte", op);
+            //this.trace("LD Vx, byte", op);
             this.V[this.get_x(op)] = this.get_kk(op);
             this.PC += 2;
             break;
         case 0x7000: /* 7XKK - ADD Vx, byte */
-            this.cpuTrace("ADD Vx, byte", op);
+            //this.trace("ADD Vx, byte", op);
             this.V[this.get_x(op)] = (this.V[this.get_x(op)] + this.get_kk(op)) & 0xFF;
             this.PC += 2;
             break;
         case 0x8000:
             switch (this.get_n(op)) {
             case 0x0: /* 8XY0 - LD Vx, Vy */
-                this.cpuTrace("LD Vx, Vy", op);
+                //this.trace("LD Vx, Vy", op);
                 this.V[this.get_x(op)] = this.V[this.get_y(op)];
                 this.PC += 2;
                 break;
             case 0x1: /* 8XY1 - OR Vx, Vy */
-                this.cpuTrace("OR Vx, Vy", op);
+                //this.trace("OR Vx, Vy", op);
                 this.V[this.get_x(op)] |= this.V[this.get_y(op)];
                 if (q.vfResetQuirk)
                     this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x2: /* 8XY2 - AND Vx, Vy */
-                this.cpuTrace("AND Vx, Vy", op);
+                //this.trace("AND Vx, Vy", op);
                 this.V[this.get_x(op)] &= this.V[this.get_y(op)];
                 if (q.vfResetQuirk)
                     this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x3: /* 8XY3 - XOR Vx, Vy */
-                this.cpuTrace("XOR Vx, Vy", op);
+                //this.trace("XOR Vx, Vy", op);
                 this.V[this.get_x(op)] ^= this.V[this.get_y(op)];
                 if (q.vfResetQuirk)
                     this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x4: { /* 8XY4 - ADD Vx, Vy */
-                this.cpuTrace("ADD Vx, Vy", op);
+                //this.trace("ADD Vx, Vy", op);
                 let sum = this.V[this.get_x(op)] + this.V[this.get_y(op)];
                 this.V[this.get_x(op)] = sum & 0xFF;
                 this.V[0xF] = (sum > 255) ? 1 : 0;
@@ -265,7 +220,7 @@ export class Chip8 {
                 break;
             }
             case 0x5: { /* 8XY5 - SUB Vx, Vy */
-                this.cpuTrace("SUB Vx, Vy", op);
+                //this.trace("SUB Vx, Vy", op);
                 let borrow = (this.V[this.get_x(op)]) >= this.V[this.get_y(op)] ? 1 : 0;
                 this.V[this.get_x(op)] = (this.V[this.get_x(op)] - this.V[this.get_y(op)]) & 0xFF;
                 this.V[0xF] = borrow;
@@ -273,7 +228,7 @@ export class Chip8 {
                 break;
             }
             case 0x6: { /* 8XY6 - SHR Vx {, Vy} */
-                this.cpuTrace("SHR Vx, Vy", op);
+                //this.trace("SHR Vx, Vy", op);
                 const value = q.shiftQuirk
                     ? this.V[this.get_x(op)]
                     : this.V[this.get_y(op)];
@@ -283,7 +238,7 @@ export class Chip8 {
                 break;
             }
             case 0x7: { /* 8XY7 - SUBN Vx, Vy */
-                this.cpuTrace("SUBN Vx, Vy", op);
+                //this.trace("SUBN Vx, Vy", op);
                 let borrow =  (this.V[this.get_y(op)] >= this.V[this.get_x(op)]) ? 1 : 0;
                 this.V[this.get_x(op)] = (this.V[this.get_y(op)] - this.V[this.get_x(op)]) & 0xFF;
                 this.V[0xF] = borrow;
@@ -291,7 +246,7 @@ export class Chip8 {
                 break;
             }
             case 0xE: { /* 8XYE - SHL Vx {, Vy} */
-                this.cpuTrace("SHL Vx, Vy", op);
+                //this.trace("SHL Vx, Vy", op);
                 const value = q.shiftQuirk
                     ? this.V[this.get_x(op)]
                     : this.V[this.get_y(op)];
@@ -306,28 +261,28 @@ export class Chip8 {
             }
             break;
         case 0x9000: /* 9XY0 - SNE Vx, Vy */
-            this.cpuTrace("SNE Vx, Vy", op);
+            //this.trace("SNE Vx, Vy", op);
             this.PC += (this.V[this.get_x(op)] != this.V[this.get_y(op)]) ? 4 : 2;
             break;
         case 0xA000: /* ANNN - LD I, addr */
-            this.cpuTrace("LD I, addr", op);
+            //this.trace("LD I, addr", op);
             this.I = this.get_nnn(op);
             this.PC += 2;
             break;
         case 0xB000: /* BNNN - JP V0, addr */
-            this.cpuTrace("JP V0, addr", op);
+            //this.trace("JP V0, addr", op);
             if (q.jumpQuirk)
                 this.PC = this.get_nnn(op) + this.V[this.get_x(op)];
             else
                 this.PC = this.get_nnn(op) + this.V[0x0];
             break;
         case 0xC000: /* CXKK - RND Vx, byte */
-            this.cpuTrace("RND Vx, Vy", op);
+            //this.trace("RND Vx, Vy", op);
             this.V[this.get_x(op)] = (Math.floor(Math.random() * 0x100)) & this.get_kk(op);
             this.PC += 2;
             break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
-            this.cpuTrace("DRW Vx, Vy", op);
+            //this.trace("DRW Vx, Vy", op);
 
             let x = this.V[this.get_x(op)] % 64;
             let y = this.V[this.get_y(op)] % 32;
@@ -366,14 +321,14 @@ export class Chip8 {
         case 0xE000:
             switch (this.get_kk(op)) {
             case 0x9E: /* EX9E - SKP Vx */
-                this.cpuTrace("SKP Vx", op);
+                //this.trace("SKP Vx", op);
                 if (this.keypad.isPressed(this.V[this.get_x(op)]))
                     this.PC += 4;
                 else
                     this.PC += 2;
                 break;
             case 0xA1: /* EXA1 - SKNP Vx */
-                this.cpuTrace("SKNP Vx", op);
+                //this.trace("SKNP Vx", op);
                 if (!this.keypad.isPressed(this.V[this.get_x(op)]))
                     this.PC += 4;
                 else
@@ -393,12 +348,12 @@ export class Chip8 {
             //);
             switch (this.get_kk(op)) {
             case 0x07: /* FX07 - LD Vx, DT */
-                this.cpuTrace("LD Vx, DT", op);
+                //this.trace("LD Vx, DT", op);
                 this.V[this.get_x(op)] = this.DT;
                 this.PC += 2;
                 break;
             case 0x0A: { /* FX0A - LD Vx, K */
-                this.cpuTrace("LD Vx, K", op);
+                //this.trace("LD Vx, K", op);
 
                 if (this.waitingKey) {
                     if (!this.keypad.isPressed(this.keyPressed)) {
@@ -425,27 +380,27 @@ export class Chip8 {
                 break;
             }
             case 0x15: /* FX15 - LD DT, Vx */
-                this.cpuTrace("LD DT, Vx", op);
+                //this.trace("LD DT, Vx", op);
                 this.DT = this.V[this.get_x(op)];
                 this.PC += 2;
                 break;
             case 0x18: /* Fx18 - LD ST, Vx */
-                this.cpuTrace("LD ST, Vx", op);
+                //this.trace("LD ST, Vx", op);
                 this.ST = this.V[this.get_x(op)];
                 this.PC += 2;
                 break;
             case 0x1E: /* FX1E - ADD I, Vx */
-                this.cpuTrace("ADD I, Vx", op);
+                //this.trace("ADD I, Vx", op);
                 this.I += this.V[this.get_x(op)];
                 this.PC += 2;
                 break;
             case 0x29: /* FX29 - LD F, Vx */
-                this.cpuTrace("LD F, Vx",op);
+                //this.trace("LD F, Vx",op);
                 this.I = this.V[this.get_x(op)] * 5;
                 this.PC += 2;
                 break;
             case 0x33: { /* Fx33 - LD B, Vx */
-                this.cpuTrace("LD B, Vx", op);
+                //this.trace("LD B, Vx", op);
                 let value = this.V[this.get_x(op)];
                 this.memory[this.I] = Math.floor(value / 100);
                 this.memory[this.I + 1] = Math.floor(value / 10) % 10;
@@ -454,7 +409,7 @@ export class Chip8 {
                 break;
             }
             case 0x55: { /* Fx55 - LD [I], Vx */
-                this.cpuTrace("LD [i], Vx", op);
+                //this.trace("LD [i], Vx", op);
                 let x = this.get_x(op);
                 for (let i = 0; i <= x; i++)
                     this.memory[this.I + i] = this.V[i];
@@ -464,7 +419,7 @@ export class Chip8 {
                 break;
             }
             case 0x65: { /* FX65 - LD Vx, [I] */
-                this.cpuTrace("LD Vx, [i]", op);
+                //this.trace("LD Vx, [i]", op);
                 let x =  this.get_x(op);
                 for (let i = 0; i <= x; i++)
                     this.V[i] = this.memory[this.I + i];

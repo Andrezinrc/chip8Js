@@ -51,20 +51,6 @@ document.addEventListener("keydown", (event) => {
     debugOverlay.classList.remove("active");
 });
 
-const traceWindow = document.querySelector("#trace-window");
-
-cpu.traceCallback = (msg)=>{
-    const lines = traceWindow.textContent.split("\n");
-
-    lines.push(msg);
-
-    if(lines.length > 100)
-        lines.shift();
-
-    traceWindow.textContent = lines.join("\n");
-    traceWindow.scrollTop = traceWindow.scrollHeight;
-};
-
 function toHex(value, digits) {
     return value.toString(16).toUpperCase().padStart(digits, "0");
 }
@@ -141,10 +127,6 @@ document.querySelectorAll("#config-overlay input[type=checkbox]").forEach(input 
         const quirks = readQuirkUI();
         cpu.setQuirks(quirks);
     });
-});
-
-document.querySelector("#trace").addEventListener("change",(e)=>{
-    cpu.debug = e.target.checked;
 });
 
 // Execute one emulator frame
