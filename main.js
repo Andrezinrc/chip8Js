@@ -2,7 +2,12 @@ import {Chip8} from './src/core/cpu.js';
 import {Video} from './src/devices/video.js';
 import {Audio} from './src/devices/audio.js';
 import {Keypad} from './src/devices/keypad.js';
-import {loadQuirkUI, readQuirkUI} from "./src/system/config.js";
+import {
+    loadQuirkUI,
+    readQuirkUI,
+    loadSavedQuirks,
+    saveQuirks
+} from "./src/system/config.js";
 import "./theme.js";
 
 const canvas =  document.getElementById("screen");
@@ -16,7 +21,10 @@ const audio = new Audio();
 // Unlock audio on the first user interaction
 canvas.addEventListener("pointerdown", ()=>audio.init(), {once:true});
 
-loadQuirkUI(cpu.quirks);
+const savedQuirks = loadSavedQuirks();
+
+cpu.setQuirks(savedQuirks);
+loadQuirkUI(savedQuirks);
 
 const configOverlay = document.querySelector("#config-overlay");
 const debugOverlay = document.querySelector("#debug-overlay");
@@ -125,7 +133,9 @@ speedSlider.addEventListener("input", (e) => {
 document.querySelectorAll("#config-overlay input[type=checkbox]").forEach(input => {
     input.addEventListener("change", ()=>{
         const quirks = readQuirkUI();
+
         cpu.setQuirks(quirks);
+        saveQuirks(quirks);
     });
 });
 

@@ -19,6 +19,8 @@ const map = {
     dispWait: "dispWaitQuirk",
 };
 
+const STORAGE_KEY = "chip8-quirks";
+
 export function loadQuirkUI(quirks)
 {
     for(const id in map) {
@@ -36,4 +38,30 @@ export function readQuirkUI()
     }
 
     return q;
+}
+
+export function loadSavedQuirks()
+{
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (!saved)
+        return { ...DEFAULT_QUIRKS };
+
+    try {
+        return {
+            ...DEFAULT_QUIRKS,
+            ...JSON.parse(saved),
+        };
+    } catch (error) {
+        console.warn("Invalid saved quirks:", error);
+        return { ...DEFAULT_QUIRKS };
+    }
+}
+
+export function saveQuirks(quirks)
+{
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(quirks)
+    );
 }

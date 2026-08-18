@@ -1,4 +1,4 @@
-const CACHE_NAME = "chip8-v17";
+const CACHE_NAME = "chip8-v18";
 
 const FILES = [
     "./",
