@@ -15,7 +15,8 @@ const map = {
     memory:"memoryQuirk",
     clip:"clipQuirk",
     jump:"jumpQuirk",
-    shift:"shiftQuirk"
+    shift:"shiftQuirk",
+    dispWait: "dispWaitQuirk",
 };
 
 export function loadQuirkUI(quirks)

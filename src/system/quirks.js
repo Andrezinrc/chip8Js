@@ -4,4 +4,5 @@ export const DEFAULT_QUIRKS = {
     clipQuirk: true,
     jumpQuirk: true,
     shiftQuirk: true,
+    dispWaitQuirk: false,
 };

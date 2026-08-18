@@ -33,16 +33,16 @@ export class Chip8 {
             ...config.quirks,
         };
 
-
         this.cyclesPerFrame = 10;
 
+        this.displayWait = false;
         this.halted = false;
 
         this.cpuInit();
     }
 
 
-    UNKNOWN_OPCODE(op) {    console.log(`UNKNOWN OPCODE ${op}`);    }
+    UNKNOWN_OPCODE(op) {    console.log(`UNKNOWN OPCODE 0x${op.toString(16)}`);    }
 
 
     // Instruction operand extractors
@@ -93,6 +93,7 @@ export class Chip8 {
         for (let i = 0; i < FONTSET.length; i++)
             this.memory[i] = FONTSET[i];
         
+        this.displayWait = false;
         this.halted = false;
     }
 
@@ -117,7 +118,8 @@ export class Chip8 {
     // CPU Instructions
 
     cpuStep() {
-        if (this.halted) return;
+        if (this.displayWait || this.halted)
+            return;
         
         const q =  this.quirks;
 
@@ -316,6 +318,8 @@ export class Chip8 {
             }
             
             this.PC += 2;
+            if (q.dispWaitQuirk)
+                this.displayWait = true;
             break;
         }
         case 0xE000:
@@ -442,6 +446,8 @@ export class Chip8 {
     // Execute CPU cycle
 
     cpuCycle() {
+        this.displayWait = false;
+
         for (let i = 0; i < this.cyclesPerFrame; i++)
             this.cpuStep();
 
