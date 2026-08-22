@@ -27,17 +27,17 @@ body {
 }
 
 body.theme-plum {
-    --bg: #2b2436;
-    --vid: #372d45;
-    --border: #57476c;
-    --text: #ece7f8;
+    --bg: #1a1510;
+    --vid: #261f18;
+    --border: #4a3b2c;
+    --text: #f5b041;
 }
 
 body.theme-slate {
-    --bg: #20262e;
-    --vid: #2b343e;
-    --border: #495766;
-    --text: #eef3f7;
+    --bg: #0f140f;
+    --vid: #162016;
+    --border: #2e4a2e;
+    --text: #76d7c4;
 }
 
 /* Header */
@@ -89,11 +89,11 @@ header h1 {
 }
 
 .theme-btn[data-theme="plum"] {
-    background: #6b4b8a;
+    background: #f5b041;
 }
 
 .theme-btn[data-theme="slate"] {
-    background: #465468;
+    background: #76d7c4;
 }
 
 #config-btn,
