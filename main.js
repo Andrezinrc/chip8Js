@@ -86,11 +86,15 @@ let lastSoundState = false;
 const speedSlider = document.getElementById("speed");
 const speedValue = document.getElementById("speed-value");
 
+const romName = document.getElementById("rom-name");
+
 document.getElementById("rom-upload").addEventListener("change", async(event)  => {
     await audio.init();
 
     const file =  event.target.files[0];
     if (!file) return;
+
+    romName.textContent = file.name;
 
     try {
         const buffer = await file.arrayBuffer();
