@@ -558,3 +558,30 @@ footer a:hover {
         min-height: 40px;
     }
 }
+
+@media (max-width: 768px) and (orientation: landscape) {
+    header {
+        display: none;
+    }
+
+    .container {
+        max-width: none;
+        height: 100dvh;
+    }
+
+    .video {
+        padding: 8px;
+    }
+
+    canvas {
+        width: min(96vw, 96dvh * 2);
+        max-width: none;
+        max-height: 96dvh;
+    }
+
+    .controls,
+    .keypad,
+    footer {
+        display: none;
+    }
+}
