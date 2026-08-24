@@ -13,6 +13,8 @@
     --vid: #c7c7c2;
     --border: #a7a7a2;
     --text: #1d1d1d;
+    --button-dark: #101010;
+    --button-shadow: #050505;
 }
 
 body {
@@ -31,6 +33,8 @@ body.theme-plum {
     --vid: #261f18;
     --border: #4a3b2c;
     --text: #f5b041;
+    --button-dark: #101010;
+    --button-shadow: #050505;
 }
 
 body.theme-slate {
@@ -38,6 +42,8 @@ body.theme-slate {
     --vid: #162016;
     --border: #2e4a2e;
     --text: #76d7c4;
+    --button-dark: #101010;
+    --button-shadow: #050505;
 }
 
 /* Header */
@@ -52,7 +58,7 @@ header {
 
 header h1 {
     font-size: 1rem;
-    font-weight: 550;
+    font-weight: 500;
     letter-spacing: .15em;
     text-transform: uppercase;
 }
@@ -107,6 +113,7 @@ header h1 {
     font-size: 1.2rem;
     cursor: pointer;
     color: var(--text);
+    transition: opacity .12s, transform .05s;
 }
 
 #config-btn {
@@ -115,6 +122,16 @@ header h1 {
 
 #debug-btn {
     right: 14px;
+}
+
+#config-btn:hover,
+#debug-btn:hover {
+    opacity: .7;
+}
+
+#config-btn:active,
+#debug-btn:active {
+    transform: translateY(1px);
 }
 
 /* Layout */
@@ -130,6 +147,7 @@ header h1 {
 
 .video {
     flex: 1;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -199,9 +217,15 @@ canvas {
 #reset-rom,
 #pause-rom {
     border-bottom: 1px solid var(--border);
-    transition: transform .05s, filter .08s;
+    transition: transform .05s, filter .08s, background .12s;
     box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.upload span:hover,
+#reset-rom:hover,
+#pause-rom:hover {
+    filter: brightness(.97);
 }
 
 .upload span:active,
@@ -209,11 +233,6 @@ canvas {
 #pause-rom:active {
     transform: translateY(1px);
     filter: brightness(.95);
-}
-
-.controls {
-    display: flex;
-    flex-direction: column;
 }
 
 .speed-control {
@@ -254,8 +273,9 @@ canvas {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #1d1d1d;
+    background: var(--text);
     cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.18);
 }
 
 .speed-control input[type="range"]::-moz-range-thumb {
@@ -263,8 +283,9 @@ canvas {
     height: 14px;
     border: none;
     border-radius: 50%;
-    background: #1d1d1d;
+    background: var(--text);
     cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.18);
 }
 
 /* Mobile keypad */
@@ -358,6 +379,7 @@ canvas {
     z-index: 100;
     align-items: center;
     justify-content: center;
+    padding: 12px;
 }
 
 #config-overlay.active,
@@ -368,6 +390,8 @@ canvas {
 .config-panel {
     width: 90%;
     max-width: 360px;
+    max-height: 90dvh;
+    overflow-y: auto;
     background: var(--bg);
     border: 1px solid var(--border);
     box-shadow:
@@ -399,6 +423,7 @@ canvas {
 .config-panel input[type="checkbox"] {
     width: 18px;
     height: 18px;
+    accent-color: var(--text);
 }
 
 #close-config,
@@ -406,14 +431,26 @@ canvas {
     margin-top: 20px;
     width: 100%;
     height: 40px;
-    background: #101010;
+    background: var(--button-dark);
     color: white;
     border: none;
     font-family: inherit;
     box-shadow:
-        0 2px 0 #050505,
+        0 2px 0 var(--button-shadow),
         0 4px 8px rgba(0, 0, 0, .12);
     transition: transform .05s, filter .08s;
+    cursor: pointer;
+}
+
+#close-config:hover,
+#close-debug:hover {
+    filter: brightness(1.15);
+}
+
+#close-config:active,
+#close-debug:active {
+    transform: translateY(1px);
+    filter: brightness(.95);
 }
 
 /* Debug */
@@ -489,6 +526,15 @@ footer a {
 
 footer a:hover {
     opacity: .7;
+}
+
+/* Focus */
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
 }
 
 /* Mobile */
