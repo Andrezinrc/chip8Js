@@ -1,10 +1,26 @@
 export class Video {
     constructor(ctx) {
         this.ctx = ctx;
-        this.imgData =  ctx.createImageData(64, 32);
+        this.width = 64;
+        this.height = 32;
+        this.ctx.canvas.width = this.width;
+        this.ctx.canvas.height  = this.height;
+        this.imgData = this.ctx.createImageData(this.width, this.height);
+    }
+
+    setRes(width, height) {
+        this.width= width;
+        this.height = height;
+        this.ctx.canvas.width = this.width;
+        this.ctx.canvas.height = this.height;
+        this.imgData = this.ctx.createImageData(width,height);
     }
 
     render(cpu) {
+        if (this.width !== cpu.displayWidth ||
+                this.height !== cpu.displayHeight)
+            this.setRes(cpu.displayWidth, cpu.displayHeight);
+
         const data = this.imgData.data;
         const video = cpu.video;
 

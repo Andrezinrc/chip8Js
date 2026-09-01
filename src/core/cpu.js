@@ -16,6 +16,9 @@ export class Chip8 {
         // Video
         this.video = new Uint8Array(2048);
 
+        this.displayWidth = 64;
+        this.displayHeight = 32;
+
         // keypad
         this.keypad = keypad;
         this.waitingKey = false;
@@ -75,7 +78,58 @@ export class Chip8 {
             this.memory[i] = FONTSET[i];
     }
 
+    setLowRes() {
+        this.displayWidth = 64;
+        this.displayHeight = 32;
+        this.video = new Uint8Array(2048);
+    }
+
+    setHighRes() {
+        this.displayWidth = 128;
+        this.displayHeight = 64;
+        this.video = new Uint8Array(8192);
+    }
+
+    scrollDown(n) {
+        const w = this.displayWidth;
+        const h = this.displayHeight;
+        const newVideo = new Uint8Array(w * h);
+
+        for (let y = n; y < h; y++){
+            for (let x=0; x < w; x++)
+                newVideo[y * w + x] = this.video[(y - n) * w + x];
+        }
+
+        this.video = newVideo;
+    }
+
+     scrollRight() {
+        const w = this.displayWidth;
+        const h = this.displayHeight;
+        const newVideo = new Uint8Array(w * h);
+
+        for (let y = 0; y < h; y++){
+            for (let x=0; x < w - 4; x++)
+                newVideo[y * w + x + 4] = this.video[y * w + x];
+        }
+
+        this.video = newVideo;
+    }  
     
+    scrollLeft() {
+        const w = this.displayWidth;
+        const h = this.displayHeight;
+        const newVideo = new Uint8Array(w * h);
+
+        for (let y = 0; y < h; y++){
+            for (let x=4; x < w; x++)
+                newVideo[y * w + x - 4] = this.video[y * w + x];
+        }
+
+        this.video = newVideo;
+    } 
+
+
     cpuReset() {
         this.memory.fill(0);
         this.V.fill(0);
@@ -83,6 +137,9 @@ export class Chip8 {
         this.PC = 0x200;
         this.stack.fill(0);
         this.SP = 0;
+        
+        this.setLowRes();
+
         this.video.fill(0);
         this.waitingKey = false;
         this.keyPressed = -1;
@@ -138,6 +195,14 @@ export class Chip8 {
                 //this.trace("RET", op);
                 this.SP--;
                 this.PC = this.stack[this.SP];
+                this.PC += 2;
+                break;
+            case 0x00FE: /* LOW RES */
+                this.setLowRes();
+                this.PC += 2;
+                break;
+            case 0x00FF: /* HIGH RES */
+                this.setHighRes();
                 this.PC += 2;
                 break;
             default: /* SYS */
@@ -286,30 +351,49 @@ export class Chip8 {
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             //this.trace("DRW Vx, Vy", op);
 
-            let x = this.V[this.get_x(op)] % 64;
-            let y = this.V[this.get_y(op)] % 32;
+            let x = this.V[this.get_x(op)] % this.displayWidth;
+            let y = this.V[this.get_y(op)] % this.displayHeight;
             let h = this.get_n(op);
+
+            // CHIP-8: 8 x N
+            // SCHIP: DXY0 = 16 x 16
+
+            let width = 8;
+            let height = h;
+
+            if (h === 0 && this.displayWidth === 128) {
+                width=16;
+                height=16;
+            }
 
             this.V[0xF] = 0;
 
-            for (let row = 0; row < h; row++) {
-                let spriteRow = this.memory[this.I + row];
+            for (let row = 0; row < height; row++) {
+                let spriteRow;
+
+                if (width === 16) {
+                    spriteRow = (this.memory[this.I + row * 2] << 8) |
+                            this.memory[this.I + row * 2 + 1];
+                } else {
+                    spriteRow = this.memory[this.I + row];
+                }
                 
-                for (let col = 0; col < 8; col++) {
+                for (let col = 0; col < width; col++) {
                     
-                    if ((spriteRow & (0x80 >> col)) != 0) {
+                    if ((spriteRow & (width === 16 ? 0x8000 : 0x80) >> col) != 0) {
                         let px = x + col;
                         let py = y + row;
 
                         if (q.clipQuirk) {
-                            if (px >= 64 || py >= 32)
+                            if (px >= this.displayWidth ||
+                                    py >= this.displayHeight)
                                 continue;
                         } else {
-                            px %= 64;
-                            py %= 32;
+                            px %= this.displayWidth;
+                            py %= this.displayHeight;
                         }
 
-                        let vid_index = px + (py * 64);
+                        let vid_index = px + (py * this.displayWidth);
                         if (this.video[vid_index] === 1)
                             this.V[0xF] = 1;
                         this.video[vid_index] ^= 1;
