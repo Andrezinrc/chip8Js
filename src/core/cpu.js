@@ -147,9 +147,11 @@ export class Chip8 {
         this.DT = 0;
         this.ST = 0;
 
-        for (let i = 0; i < FONTSET.length; i++)
-            this.memory[i] = FONTSET[i];
-        
+        for (let i = 0; i < CHIP8_FONTSET.length; i++)
+            this.memory[i] = CHIP8_FONTSET[i];
+        for (let i = 0; i < SCHIP_FONTSET.length; i++)
+            this.memory[0x50 + i] = SCHIP_FONTSET[i];
+
         this.displayWait = false;
         this.halted = false;
     }
@@ -185,6 +187,12 @@ export class Chip8 {
         /* Decode & Execute */
         switch (op & 0xF000) {
         case 0x0000:
+            if ((op & 0xFFF0) === 0x00C0) {
+                this.scrollDown(this.get_n(op));
+                this.PC += 2;
+                break;
+            }
+
             switch (this.get_kk(op)) {
             case 0x00E0: /* CLS */
                 //this.trace("CLS", op);
@@ -195,6 +203,18 @@ export class Chip8 {
                 //this.trace("RET", op);
                 this.SP--;
                 this.PC = this.stack[this.SP];
+                this.PC += 2;
+                break;
+            case 0x00FB: /* SCROLL RIGHT */
+                this.scrollRight();
+                this.PC += 2;
+                break;
+            case 0x00FC: /* SCROLL LEFT */
+                this.scrollLeft();
+                this.PC += 2;
+                break;
+            case 0x00FD: /* EXIT */
+                this.halted=true;
                 this.PC += 2;
                 break;
             case 0x00FE: /* LOW RES */
@@ -485,6 +505,10 @@ export class Chip8 {
             case 0x29: /* FX29 - LD F, Vx */
                 //this.trace("LD F, Vx",op);
                 this.I = this.V[this.get_x(op)] * 5;
+                this.PC += 2;
+                break;
+            case 0x30: /* FX30 - LD HF, Vx */
+                this.I = 50 + this.V[this.get_x(op)] * 10;
                 this.PC += 2;
                 break;
             case 0x33: { /* Fx33 - LD B, Vx */
