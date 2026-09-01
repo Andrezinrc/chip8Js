@@ -234,8 +234,8 @@ export class Chip8 {
                 const value = q.shiftQuirk
                     ? this.V[this.get_x(op)]
                     : this.V[this.get_y(op)];
-                this.V[0xF] = value & 0x1;
                 this.V[this.get_x(op)] = value >> 1;
+                this.V[0xF] = value & 0x1;
                 this.PC += 2;
                 break;
             }
@@ -252,8 +252,8 @@ export class Chip8 {
                 const value = q.shiftQuirk
                     ? this.V[this.get_x(op)]
                     : this.V[this.get_y(op)];
-                this.V[0xF] =(value >> 7) & 0x1;
                 this.V[this.get_x(op)] = (value << 1) & 0xFF;
+                this.V[0xF] = (value >> 7) & 0x1;
                 this.PC += 2;
                 break;
             }
