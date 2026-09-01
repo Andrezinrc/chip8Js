@@ -1,4 +1,4 @@
-import {FONTSET} from '../assets/fontset.js';
+import {CHIP8_FONTSET, SCHIP_FONTSET} from '../assets/fontset.js';
 import {DEFAULT_QUIRKS} from '../system/quirks.js';
 
 export class Chip8 {
@@ -56,7 +56,7 @@ export class Chip8 {
     get_kk(op)  {   return (op & 0x00FF);        }
     get_nnn(op) {   return (op & 0x0FFF);        }
 
-    // Load rom
+    // Loads
 
     loadRom(romData) {
         this.rom = new Uint8Array(romData);
@@ -72,11 +72,22 @@ export class Chip8 {
             this.memory[0x200 + i] = romData[i];
     }
 
+    loadFonts() {
+        for (let i = 0; i < CHIP8_FONTSET.length; i++)
+            this.memory[i] = CHIP8_FONTSET[i];
+
+        for (let i = 0; i < SCHIP_FONTSET.length; i++)
+            this.memory[0x50 + i] = SCHIP_FONTSET[i];
+    }
+
+
     cpuInit() {
         console.log("--- Initializing CPU ---\n");
-        for (let i = 0; i < FONTSET.length; i++)
-            this.memory[i] = FONTSET[i];
+        this.loadFonts();
     }
+
+
+    // Display
 
     setLowRes() {
         this.displayWidth = 64;
@@ -127,7 +138,10 @@ export class Chip8 {
         }
 
         this.video = newVideo;
-    } 
+    }
+
+
+    // Reset
 
 
     cpuReset() {
@@ -147,10 +161,7 @@ export class Chip8 {
         this.DT = 0;
         this.ST = 0;
 
-        for (let i = 0; i < CHIP8_FONTSET.length; i++)
-            this.memory[i] = CHIP8_FONTSET[i];
-        for (let i = 0; i < SCHIP_FONTSET.length; i++)
-            this.memory[0x50 + i] = SCHIP_FONTSET[i];
+        this.loadFonts();
 
         this.displayWait = false;
         this.halted = false;
