@@ -143,6 +143,54 @@ export class Chip8 {
         this.video = newVideo;
     }
 
+    drawSprite(x, y, h) {
+        // CHIP-8: 8 x N
+        // SCHIP: DXY0 = 16 x 16
+
+        let width = 8;
+        let height = h;
+
+        if (h === 0 && this.displayWidth === 128) {
+            width=16;
+            height=16;
+        }
+
+        this.V[0xF] = 0;
+
+        for (let row = 0; row < height; row++) {
+            let spriteRow;
+
+            if (width === 16)
+                spriteRow = (this.memory[this.I + row * 2] << 8) |
+                            this.memory[this.I + row * 2 + 1];
+            else
+                spriteRow = this.memory[this.I + row];
+                
+            for (let col = 0; col < width; col++) {
+                    
+                if ((spriteRow & (width === 16 ? (0x8000 >> col) : (0x80 >> col))) !== 0) {
+                    let px = x + col;
+                    let py = y + row;
+
+                    const q = this.quirks;
+                    if (q.clipQuirk) {
+                        if (px >= this.displayWidth ||
+                                py >= this.displayHeight)
+                            continue;
+                    } else {
+                            px %= this.displayWidth;
+                            py %= this.displayHeight;
+                    }
+
+                    let vid_index = px + (py * this.displayWidth);
+                    if (this.video[vid_index] === 1)
+                        this.V[0xF] = 1;
+                    this.video[vid_index] ^= 1;
+                }
+            }
+        }
+    }
+
 
     // Reset
 
@@ -391,51 +439,7 @@ export class Chip8 {
             let y = this.V[this.get_y(op)] % this.displayHeight;
             let h = this.get_n(op);
 
-            // CHIP-8: 8 x N
-            // SCHIP: DXY0 = 16 x 16
-
-            let width = 8;
-            let height = h;
-
-            if (h === 0 && this.displayWidth === 128) {
-                width=16;
-                height=16;
-            }
-
-            this.V[0xF] = 0;
-
-            for (let row = 0; row < height; row++) {
-                let spriteRow;
-
-                if (width === 16) {
-                    spriteRow = (this.memory[this.I + row * 2] << 8) |
-                            this.memory[this.I + row * 2 + 1];
-                } else {
-                    spriteRow = this.memory[this.I + row];
-                }
-                
-                for (let col = 0; col < width; col++) {
-                    
-                    if ((spriteRow & (width === 16 ? (0x8000 >> col) : (0x80 >> col))) !== 0) {
-                        let px = x + col;
-                        let py = y + row;
-
-                        if (q.clipQuirk) {
-                            if (px >= this.displayWidth ||
-                                    py >= this.displayHeight)
-                                continue;
-                        } else {
-                            px %= this.displayWidth;
-                            py %= this.displayHeight;
-                        }
-
-                        let vid_index = px + (py * this.displayWidth);
-                        if (this.video[vid_index] === 1)
-                            this.V[0xF] = 1;
-                        this.video[vid_index] ^= 1;
-                    }
-                }
-            }
+            this.drawSprite(x, y, h);
             
             this.PC += 2;
             if (q.dispWaitQuirk)
