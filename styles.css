@@ -28,24 +28,6 @@ body {
     -webkit-user-select: none;
 }
 
-body.theme-plum {
-    --bg: #1a1510;
-    --vid: #261f18;
-    --border: #4a3b2c;
-    --text: #f5b041;
-    --button-dark: #101010;
-    --button-shadow: #050505;
-}
-
-body.theme-slate {
-    --bg: #0f140f;
-    --vid: #162016;
-    --border: #2e4a2e;
-    --text: #76d7c4;
-    --button-dark: #101010;
-    --button-shadow: #050505;
-}
-
 /* Header */
 
 header {
