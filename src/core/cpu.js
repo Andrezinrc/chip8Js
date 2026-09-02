@@ -60,23 +60,19 @@ export class Chip8 {
     // Loads
 
     loadRom(romData) {
-        this.rom = new Uint8Array(romData);
-
-        this.cpuReset();
-
+        const rom = new Uint8Array(romData);
         if (romData.length > 3584) {
             console.log("ROM too large");
             return;
         }
-
-        for (let i = 0; i < romData.length; i++)
-            this.memory[0x200 + i] = romData[i];
+        this.rom = rom;
+        this.cpuReset();
+        this.memory.set(this.rom, 0x200);
     }
 
     loadFonts() {
         for (let i = 0; i < CHIP8_FONTSET.length; i++)
             this.memory[i] = CHIP8_FONTSET[i];
-
         for (let i = 0; i < SCHIP_FONTSET.length; i++)
             this.memory[0x50 + i] = SCHIP_FONTSET[i];
     }
