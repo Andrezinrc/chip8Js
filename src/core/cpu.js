@@ -1,6 +1,12 @@
 import {CHIP8_FONTSET, SCHIP_FONTSET} from '../assets/fontset.js';
 import {DEFAULT_QUIRKS} from '../system/quirks.js';
 
+const getX = op => (op & 0x0F00) >> 8;
+const getY = op => (op & 0x00F0) >> 4;
+const getN = op => (op & 0x000F);
+const getKK = op => (op & 0x00FF);
+const getNNN =  op => (op & 0x0FFF);
+
 export class Chip8 {
     constructor(keypad, config = {}) {
         // Core
@@ -50,14 +56,6 @@ export class Chip8 {
 
     UNKNOWN_OPCODE(op) {    console.log(`UNKNOWN OPCODE 0x${op.toString(16)}`);    }
 
-
-    // Instruction operand extractors
-    
-    get_x(op)   {   return (op & 0x0F00) >> 8;   }
-    get_y(op)   {   return (op & 0x00F0) >> 4;   }
-    get_n(op)   {   return (op & 0x000F);        }
-    get_kk(op)  {   return (op & 0x00FF);        }
-    get_nnn(op) {   return (op & 0x0FFF);        }
 
     // Loads
 
@@ -252,12 +250,12 @@ export class Chip8 {
         switch (op & 0xF000) {
         case 0x0000:
             if ((op & 0xFFF0) === 0x00C0) {
-                this.scrollDown(this.get_n(op));
+                this.scrollDown(getN(op));
                 this.PC += 2;
                 break;
             }
 
-            switch (this.get_kk(op)) {
+            switch (getKK(op)) {
             case 0x00E0: /* CLS */
                 //this.trace("CLS", op);
                 this.video.fill(0);
@@ -297,27 +295,27 @@ export class Chip8 {
             break;
         case 0x1000: /* 1NNN - JP addr */
             //this.trace("JP", op);
-            this.PC = this.get_nnn(op);
+            this.PC = getNNN(op);
             break;
         case 0x2000: /* 2NNN - CALL addr */
             //this.trace("CALL", op);
             this.stack[this.SP] = this.PC;
             this.SP++;
-            this.PC = this.get_nnn(op);
+            this.PC = getNNN(op);
             break;
         case 0x3000: /* 3XKK - SE Vx, byte */
             //this.trace("SE Vx, byte", op);
-            this.PC += (this.V[this.get_x(op)] == this.get_kk(op)) ? 4 : 2;
+            this.PC += (this.V[getX(op)] == getKK(op)) ? 4 : 2;
             break;
         case 0x4000: /* 4XKK - SNE Vx, byte */
             //this.trace("SNE Vx, byte",op);
-            this.PC += (this.V[this.get_x(op)] != this.get_kk(op)) ? 4 : 2;
+            this.PC += (this.V[getX(op)] != getKK(op)) ? 4 : 2;
             break;
         case 0x5000:
-            switch (this.get_n(op)) {
+            switch (getN(op)) {
             case 0x0: /* 5XY0 - SE Vx, Vy */
                 //this.trace("SE Vx, Vy", op);
-                this.PC += (this.V[this.get_x(op)] === this.V[this.get_y(op)]) ? 4 : 2;
+                this.PC += (this.V[getX(op)] === this.V[getY(op)]) ? 4 : 2;
                 break;
             default:
                 this.UNKNOWN_OPCODE(op);
@@ -326,54 +324,54 @@ export class Chip8 {
             break;
         case 0x6000: /* 6XKK - LD Vx, byte */
             //this.trace("LD Vx, byte", op);
-            this.V[this.get_x(op)] = this.get_kk(op);
+            this.V[getX(op)] = getKK(op);
             this.PC += 2;
             break;
         case 0x7000: /* 7XKK - ADD Vx, byte */
             //this.trace("ADD Vx, byte", op);
-            this.V[this.get_x(op)] = (this.V[this.get_x(op)] + this.get_kk(op)) & 0xFF;
+            this.V[getX(op)] = (this.V[getX(op)] + getKK(op)) & 0xFF;
             this.PC += 2;
             break;
         case 0x8000:
-            switch (this.get_n(op)) {
+            switch (getN(op)) {
             case 0x0: /* 8XY0 - LD Vx, Vy */
                 //this.trace("LD Vx, Vy", op);
-                this.V[this.get_x(op)] = this.V[this.get_y(op)];
+                this.V[getX(op)] = this.V[getY(op)];
                 this.PC += 2;
                 break;
             case 0x1: /* 8XY1 - OR Vx, Vy */
                 //this.trace("OR Vx, Vy", op);
-                this.V[this.get_x(op)] |= this.V[this.get_y(op)];
+                this.V[getX(op)] |= this.V[getY(op)];
                 if (q.vfResetQuirk)
                     this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x2: /* 8XY2 - AND Vx, Vy */
                 //this.trace("AND Vx, Vy", op);
-                this.V[this.get_x(op)] &= this.V[this.get_y(op)];
+                this.V[getX(op)] &= this.V[getY(op)];
                 if (q.vfResetQuirk)
                     this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x3: /* 8XY3 - XOR Vx, Vy */
                 //this.trace("XOR Vx, Vy", op);
-                this.V[this.get_x(op)] ^= this.V[this.get_y(op)];
+                this.V[getX(op)] ^= this.V[getY(op)];
                 if (q.vfResetQuirk)
                     this.V[0xF] = 0;
                 this.PC += 2;
                 break;
             case 0x4: { /* 8XY4 - ADD Vx, Vy */
                 //this.trace("ADD Vx, Vy", op);
-                let sum = this.V[this.get_x(op)] + this.V[this.get_y(op)];
-                this.V[this.get_x(op)] = sum & 0xFF;
+                let sum = this.V[getX(op)] + this.V[getY(op)];
+                this.V[getX(op)] = sum & 0xFF;
                 this.V[0xF] = (sum > 255) ? 1 : 0;
                 this.PC += 2;
                 break;
             }
             case 0x5: { /* 8XY5 - SUB Vx, Vy */
                 //this.trace("SUB Vx, Vy", op);
-                let borrow = (this.V[this.get_x(op)]) >= this.V[this.get_y(op)] ? 1 : 0;
-                this.V[this.get_x(op)] = (this.V[this.get_x(op)] - this.V[this.get_y(op)]) & 0xFF;
+                let borrow = (this.V[getX(op)]) >= this.V[getY(op)] ? 1 : 0;
+                this.V[getX(op)] = (this.V[getX(op)] - this.V[getY(op)]) & 0xFF;
                 this.V[0xF] = borrow;
                 this.PC += 2;
                 break;
@@ -381,17 +379,17 @@ export class Chip8 {
             case 0x6: { /* 8XY6 - SHR Vx {, Vy} */
                 //this.trace("SHR Vx, Vy", op);
                 const value = q.shiftQuirk
-                    ? this.V[this.get_x(op)]
-                    : this.V[this.get_y(op)];
-                this.V[this.get_x(op)] = value >> 1;
+                    ? this.V[getX(op)]
+                    : this.V[getY(op)];
+                this.V[getX(op)] = value >> 1;
                 this.V[0xF] = value & 0x1;
                 this.PC += 2;
                 break;
             }
             case 0x7: { /* 8XY7 - SUBN Vx, Vy */
                 //this.trace("SUBN Vx, Vy", op);
-                let borrow =  (this.V[this.get_y(op)] >= this.V[this.get_x(op)]) ? 1 : 0;
-                this.V[this.get_x(op)] = (this.V[this.get_y(op)] - this.V[this.get_x(op)]) & 0xFF;
+                let borrow =  (this.V[getY(op)] >= this.V[getX(op)]) ? 1 : 0;
+                this.V[getX(op)] = (this.V[getY(op)] - this.V[getX(op)]) & 0xFF;
                 this.V[0xF] = borrow;
                 this.PC += 2;
                 break;
@@ -399,9 +397,9 @@ export class Chip8 {
             case 0xE: { /* 8XYE - SHL Vx {, Vy} */
                 //this.trace("SHL Vx, Vy", op);
                 const value = q.shiftQuirk
-                    ? this.V[this.get_x(op)]
-                    : this.V[this.get_y(op)];
-                this.V[this.get_x(op)] = (value << 1) & 0xFF;
+                    ? this.V[getX(op)]
+                    : this.V[getY(op)];
+                this.V[getX(op)] = (value << 1) & 0xFF;
                 this.V[0xF] = (value >> 7) & 0x1;
                 this.PC += 2;
                 break;
@@ -413,31 +411,31 @@ export class Chip8 {
             break;
         case 0x9000: /* 9XY0 - SNE Vx, Vy */
             //this.trace("SNE Vx, Vy", op);
-            this.PC += (this.V[this.get_x(op)] != this.V[this.get_y(op)]) ? 4 : 2;
+            this.PC += (this.V[getX(op)] != this.V[getY(op)]) ? 4 : 2;
             break;
         case 0xA000: /* ANNN - LD I, addr */
             //this.trace("LD I, addr", op);
-            this.I = this.get_nnn(op);
+            this.I = getNNN(op);
             this.PC += 2;
             break;
         case 0xB000: /* BNNN - JP V0, addr */
             //this.trace("JP V0, addr", op);
             if (q.jumpQuirk)
-                this.PC = this.get_nnn(op) + this.V[this.get_x(op)];
+                this.PC = getNNN(op) + this.V[getX(op)];
             else
-                this.PC = this.get_nnn(op) + this.V[0x0];
+                this.PC = getNNN(op) + this.V[0x0];
             break;
         case 0xC000: /* CXKK - RND Vx, byte */
             //this.trace("RND Vx, Vy", op);
-            this.V[this.get_x(op)] = (Math.floor(Math.random() * 0x100)) & this.get_kk(op);
+            this.V[getX(op)] = (Math.floor(Math.random() * 0x100)) & getKK(op);
             this.PC += 2;
             break;
         case 0xD000: { /* DXYN - DRW Vx, Vy, nibble */
             //this.trace("DRW Vx, Vy", op);
 
-            let x = this.V[this.get_x(op)] % this.displayWidth;
-            let y = this.V[this.get_y(op)] % this.displayHeight;
-            let h = this.get_n(op);
+            let x = this.V[getX(op)] % this.displayWidth;
+            let y = this.V[getY(op)] % this.displayHeight;
+            let h = getN(op);
 
             this.drawSprite(x, y, h);
             
@@ -447,17 +445,17 @@ export class Chip8 {
             break;
         }
         case 0xE000:
-            switch (this.get_kk(op)) {
+            switch (getKK(op)) {
             case 0x9E: /* EX9E - SKP Vx */
                 //this.trace("SKP Vx", op);
-                if (this.keypad.isPressed(this.V[this.get_x(op)]))
+                if (this.keypad.isPressed(this.V[getX(op)]))
                     this.PC += 4;
                 else
                     this.PC += 2;
                 break;
             case 0xA1: /* EXA1 - SKNP Vx */
                 //this.trace("SKNP Vx", op);
-                if (!this.keypad.isPressed(this.V[this.get_x(op)]))
+                if (!this.keypad.isPressed(this.V[getX(op)]))
                     this.PC += 4;
                 else
                     this.PC += 2;
@@ -472,12 +470,12 @@ export class Chip8 {
             //   "FX opcode:",
             //    op.toString(16),
             //    "kk:",
-            //    this.get_kk(op).toString(16)
+            //    getKK(op).toString(16)
             //);
-            switch (this.get_kk(op)) {
+            switch (getKK(op)) {
             case 0x07: /* FX07 - LD Vx, DT */
                 //this.trace("LD Vx, DT", op);
-                this.V[this.get_x(op)] = this.DT;
+                this.V[getX(op)] = this.DT;
                 this.PC += 2;
                 break;
             case 0x0A: { /* FX0A - LD Vx, K */
@@ -499,7 +497,7 @@ export class Chip8 {
                     if (this.keypad.isPressed(i)) {
                         this.keyPressed = i;
                         
-                        this.keyRegister =  this.get_x(op);
+                        this.keyRegister =  getX(op);
                         this.waitingKey = true;
                         
                         break;
@@ -509,31 +507,31 @@ export class Chip8 {
             }
             case 0x15: /* FX15 - LD DT, Vx */
                 //this.trace("LD DT, Vx", op);
-                this.DT = this.V[this.get_x(op)];
+                this.DT = this.V[getX(op)];
                 this.PC += 2;
                 break;
             case 0x18: /* Fx18 - LD ST, Vx */
                 //this.trace("LD ST, Vx", op);
-                this.ST = this.V[this.get_x(op)];
+                this.ST = this.V[getX(op)];
                 this.PC += 2;
                 break;
             case 0x1E: /* FX1E - ADD I, Vx */
                 //this.trace("ADD I, Vx", op);
-                this.I += this.V[this.get_x(op)];
+                this.I += this.V[getX(op)];
                 this.PC += 2;
                 break;
             case 0x29: /* FX29 - LD F, Vx */
                 //this.trace("LD F, Vx",op);
-                this.I = this.V[this.get_x(op)] * 5;
+                this.I = this.V[getX(op)] * 5;
                 this.PC += 2;
                 break;
             case 0x30: /* FX30 - LD HF, Vx */
-                this.I = 0x50 + this.V[this.get_x(op)] * 10;
+                this.I = 0x50 + this.V[getX(op)] * 10;
                 this.PC += 2;
                 break;
             case 0x33: { /* Fx33 - LD B, Vx */
                 //this.trace("LD B, Vx", op);
-                let value = this.V[this.get_x(op)];
+                let value = this.V[getX(op)];
                 this.memory[this.I] = Math.floor(value / 100);
                 this.memory[this.I + 1] = Math.floor(value / 10) % 10;
                 this.memory[this.I + 2] = value % 10;
@@ -542,7 +540,7 @@ export class Chip8 {
             }
             case 0x55: { /* Fx55 - LD [I], Vx */
                 //this.trace("LD [i], Vx", op);
-                let x = this.get_x(op);
+                let x = getX(op);
                 for (let i = 0; i <= x; i++)
                     this.memory[this.I + i] = this.V[i];
                 if (q.memoryQuirk)
@@ -552,7 +550,7 @@ export class Chip8 {
             }
             case 0x65: { /* FX65 - LD Vx, [I] */
                 //this.trace("LD Vx, [i]", op);
-                let x =  this.get_x(op);
+                let x =  getX(op);
                 for (let i = 0; i <= x; i++)
                     this.V[i] = this.memory[this.I + i];
                 if (q.memoryQuirk)
@@ -561,14 +559,14 @@ export class Chip8 {
                 break;
             }
             case 0x75: { /* FX75 - LD R, Vx */
-                let x = this.get_x(op);
+                let x = getX(op);
                 for (let i = 0; i <= x; i++)
                     this.rpl[i]=this.V[i];
                 this.PC += 2;
                 break;
             }
             case 0x85: { /* FX85 - LD Vx, R */
-                let x = this.get_x(op);
+                let x = getX(op);
                 for (let i = 0; i <= x; i++)
                     this.V[i]=this.rpl[i];
                 this.PC += 2;
