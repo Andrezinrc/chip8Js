@@ -13,6 +13,9 @@ export class Chip8 {
         this.stack   = new Uint16Array(16);
         this.SP      = 0;
 
+        // SCHIP RPL flags
+        this.rpl     = new Uint8Array(8);
+
         // Video
         this.video = new Uint8Array(2048);
 
@@ -152,6 +155,8 @@ export class Chip8 {
         this.stack.fill(0);
         this.SP = 0;
         
+        this.rpl.fill(0);
+
         this.setLowRes();
 
         this.video.fill(0);
@@ -411,7 +416,7 @@ export class Chip8 {
                 
                 for (let col = 0; col < width; col++) {
                     
-                    if ((spriteRow & (width === 16 ? 0x8000 : 0x80) >> col) != 0) {
+                    if ((spriteRow & (width === 16 ? (0x8000 >> col) : (0x80 >> col))) !== 0) {
                         let px = x + col;
                         let py = y + row;
 
@@ -519,7 +524,7 @@ export class Chip8 {
                 this.PC += 2;
                 break;
             case 0x30: /* FX30 - LD HF, Vx */
-                this.I = 50 + this.V[this.get_x(op)] * 10;
+                this.I = 0x50 + this.V[this.get_x(op)] * 10;
                 this.PC += 2;
                 break;
             case 0x33: { /* Fx33 - LD B, Vx */
@@ -548,6 +553,20 @@ export class Chip8 {
                     this.V[i] = this.memory[this.I + i];
                 if (q.memoryQuirk)
                     this.I += x + 1;
+                this.PC += 2;
+                break;
+            }
+            case 0x75: { /* FX75 - LD R, Vx */
+                let x = this.get_x(op);
+                for (let i = 0; i <= x; i++)
+                    this.rpl[i]=this.V[i];
+                this.PC += 2;
+                break;
+            }
+            case 0x85: { /* FX85 - LD Vx, R */
+                let x = this.get_x(op);
+                for (let i = 0; i <= x; i++)
+                    this.V[i]=this.rpl[i];
                 this.PC += 2;
                 break;
             }
